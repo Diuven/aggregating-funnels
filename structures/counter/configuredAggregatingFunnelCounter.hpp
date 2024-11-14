@@ -11,7 +11,7 @@
 #include "./common.hpp"
 #endif
 
-namespace SIMPLE_AGG_FUNNEL
+namespace CONFIGURED_AGG_FUNNEL
 {
 
     struct alignas(128) RandomGenerator
@@ -33,7 +33,7 @@ namespace SIMPLE_AGG_FUNNEL
     };
 
     template <typename T>
-    class alignas(1024) SimpleAggFunnelsCounter : public Counter<T>
+    class alignas(1024) ConfiguredAggFunnelCounter : public Counter<T>
     {
     private:
         struct alignas(32) MappingListNode
@@ -91,10 +91,10 @@ namespace SIMPLE_AGG_FUNNEL
         }
 
     public:
-        SimpleAggFunnelsCounter() {}
-        ~SimpleAggFunnelsCounter() { delete ebr; }
-        SimpleAggFunnelsCounter(int thread_count) : SimpleAggFunnelsCounter(0, thread_count) {}
-        SimpleAggFunnelsCounter(T start, int thread_count)
+        ConfiguredAggFunnelCounter() {}
+        ~ConfiguredAggFunnelCounter() { delete ebr; }
+        ConfiguredAggFunnelCounter(int thread_count) : ConfiguredAggFunnelCounter(0, thread_count) {}
+        ConfiguredAggFunnelCounter(T start, int thread_count)
         {
             init(start, thread_count);
         }
@@ -112,8 +112,8 @@ namespace SIMPLE_AGG_FUNNEL
                 aux_data[i].rand.seed = time_seed * 100 + i;
             }
 
-#ifdef DIRECT_THREAD_COUNT
-            int direct = DIRECT_THREAD_COUNT;
+#ifdef DIRECT_COUNT
+            int direct = DIRECT_COUNT;
 #else
             int direct = 0;
 #endif
@@ -129,7 +129,7 @@ namespace SIMPLE_AGG_FUNNEL
                 fanout = (thread_count + GROUP_SIZE - 1) / GROUP_SIZE;
 #endif
 
-#ifdef USE_ROOT_STUMP
+#ifdef USE_DIRECT_ACCESS
             std::cout << "Using root stump with direct=" << direct << std::endl;
             configure_root_fanout(direct);
 #elif defined USE_FIXED_STUMP

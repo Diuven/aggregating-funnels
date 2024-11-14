@@ -5,13 +5,13 @@
 #include <iostream>
 
 #include "./common.hpp"
-#include "./simpleAggregatingFunnelsCounter.hpp"
+#include "./configuredAggregatingFunnelCounter.hpp"
 #include "./hardwareCounter.hpp"
 
 namespace RECURSIVE_AGG_FUNNEL
 {
     template <typename T>
-    class RecursiveAggFunnelsCounter : public Counter<T>
+    class RecursiveAggFunnelCounter : public Counter<T>
     {
     private:
         struct alignas(32) MappingListNode
@@ -30,7 +30,7 @@ namespace RECURSIVE_AGG_FUNNEL
             ~Node() { delete mapping_list.load(); }
         };
 
-        alignas(1024) SIMPLE_AGG_FUNNEL::SimpleAggFunnelsCounter<T> main_counter;
+        alignas(1024) CONFIGURED_AGG_FUNNEL::ConfiguredAggFunnelCounter<T> main_counter;
         int PADDING_1[32] = {};
 
         Node child[64]; // Max thread count is 64*64=4096
@@ -53,9 +53,9 @@ namespace RECURSIVE_AGG_FUNNEL
             }
             return root_fanout;
         }
-        RecursiveAggFunnelsCounter(int thread_count) : RecursiveAggFunnelsCounter(0, thread_count) {}
-        ~RecursiveAggFunnelsCounter() { delete ebr; }
-        RecursiveAggFunnelsCounter(T start, int thread_count)
+        RecursiveAggFunnelCounter(int thread_count) : RecursiveAggFunnelCounter(0, thread_count) {}
+        ~RecursiveAggFunnelCounter() { delete ebr; }
+        RecursiveAggFunnelCounter(T start, int thread_count)
         {
             this->thread_count = thread_count;
             ebr = new EpochBasedReclamation<MappingListNode>(thread_count);

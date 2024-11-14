@@ -8,7 +8,7 @@ MACROFLAGS = -DNO_AUX_DATA
 
 # Structural settings
 COUNTER_TYPE ?= emptyCounter
-DIRECT_THREAD_COUNT ?= 0
+DIRECT_COUNT ?= 0
 AGG_COUNT ?= -1
 
 counterBenchmark:
@@ -25,40 +25,27 @@ clean:
 emptyCounter: MACROFLAGS += -DUSE_EMPTY_COUNTER
 emptyCounter: counterBenchmark
 
-simpleAtomicCounter: MACROFLAGS += -DUSE_SIMPLE_ATOMIC_COUNTER
-simpleAtomicCounter: counterBenchmark
-simpleAtomicCounterTest: MACROFLAGS += -DUSE_SIMPLE_ATOMIC_COUNTER
-simpleAtomicCounterTest: counterTest
+hardwareCounter: MACROFLAGS += -DUSE_HARDWARE_COUNTER
+hardwareCounter: counterBenchmark
+hardwareCounterTest: MACROFLAGS += -DUSE_HARDWARE_COUNTER
+hardwareCounterTest: counterTest
 
-stumpCounter: MACROFLAGS += -DUSE_STUMP_COUNTER
-stumpCounter: counterBenchmark
-stumpCounterTest: MACROFLAGS += -DUSE_STUMP_COUNTER
-stumpCounterTest: counterTest
+aggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER
+aggFunnelCounter: counterBenchmark
+aggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER
+aggFunnelCounterTest: counterTest
 
+configuredAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_STUMP -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT)
+configuredAggFunnelCounter: counterBenchmark
+configuredAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_STUMP -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT)
+configuredAggFunnelCounterTest: counterTest
 
-rootStumpCounter: MACROFLAGS += -DUSE_STUMP_COUNTER -DUSE_ROOT_STUMP -DDIRECT_THREAD_COUNT=$(DIRECT_THREAD_COUNT)
-rootStumpCounter: counterBenchmark
-rootStumpCounterTest: MACROFLAGS += -DUSE_STUMP_COUNTER -DUSE_ROOT_STUMP -DDIRECT_THREAD_COUNT=$(DIRECT_THREAD_COUNT)
-rootStumpCounterTest: counterTest
+recursiveAggFunnelCounter: MACROFLAGS += -DUSE_RECURSIVE_AGG_COUNTER
+recursiveAggFunnelCounter: counterBenchmark
+recursiveAggFunnelCounterTest: MACROFLAGS += -DUSE_RECURSIVE_AGG_COUNTER
+recursiveAggFunnelCounterTest: counterTest
 
-fixedStumpCounter: MACROFLAGS += -DUSE_STUMP_COUNTER -DUSE_FIXED_STUMP -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_THREAD_COUNT=$(DIRECT_THREAD_COUNT)
-fixedStumpCounter: counterBenchmark
-fixedStumpCounterTest: MACROFLAGS += -DUSE_STUMP_COUNTER -DUSE_FIXED_STUMP -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_THREAD_COUNT=$(DIRECT_THREAD_COUNT)
-fixedStumpCounterTest: counterTest
-
-
-nestedStumpCounter: MACROFLAGS += -DUSE_NESTED_STUMP_COUNTER
-nestedStumpCounter: counterBenchmark
-nestedStumpCounterTest: MACROFLAGS += -DUSE_NESTED_STUMP_COUNTER
-nestedStumpCounterTest: counterTest
-
-
-combiningFunnelCounter: MACROFLAGS += -DUSE_COMBINING_FUNNEL_COUNTER
-combiningFunnelCounter: counterBenchmark
-combiningFunnelCounterTest: MACROFLAGS += -DUSE_COMBINING_FUNNEL_COUNTER
-combiningFunnelCounterTest: counterTest
-
-
-subEricTree: MACROFLAGS += -DUSE_SUB_ERIC_TREE
-subEricTree: mapBenchmark
-
+combFunnelCounter: MACROFLAGS += -DUSE_COMBINING_FUNNEL_COUNTER
+combFunnelCounter: counterBenchmark
+combFunnelCounterTest: MACROFLAGS += -DUSE_COMBINING_FUNNEL_COUNTER
+combFunnelCounterTest: counterTest

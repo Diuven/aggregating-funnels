@@ -14,7 +14,7 @@ namespace COMB_FUNNEL
     };
 
     template <typename T>
-    class alignas(1024) CombiningFunnelsCounter : public Counter<T>
+    class alignas(1024) CombiningFunnelCounter : public Counter<T>
     {
     private:
     public:
@@ -64,8 +64,8 @@ namespace COMB_FUNNEL
         int PADDING_4[32] = {};
 
     public:
-        CombiningFunnelsCounter(int thread_count) : CombiningFunnelsCounter(0, thread_count) {}
-        CombiningFunnelsCounter(T start, int thread_count)
+        CombiningFunnelCounter(int thread_count) : CombiningFunnelCounter(0, thread_count) {}
+        CombiningFunnelCounter(T start, int thread_count)
         {
             this->thread_count = thread_count;
             aux_data.resize(thread_count);

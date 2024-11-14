@@ -78,7 +78,7 @@ def run_single_counter_model(
     if "rootStumpCounter" in model_type:
         direct = model_type.split("_")[1]
         subprocess.run(
-            ["make", "rootStumpCounter", f"DIRECT_THREAD_COUNT={direct}"], check=True
+            ["make", "rootStumpCounter", f"DIRECT_COUNT={direct}"], check=True
         )
     elif "fixedStumpCounter" in model_type:
         fanout = model_type.split("_")[1]
@@ -89,7 +89,7 @@ def run_single_counter_model(
                 "make",
                 "fixedStumpCounter",
                 f"FANOUT_COUNT={fanout}",
-                f"DIRECT_THREAD_COUNT={direct}",
+                f"DIRECT_COUNT={direct}",
                 f"GROUP_SIZE={group}",
             ],
             check=True,
