@@ -1,10 +1,8 @@
+#pragma once
+
 #include <atomic>
 #include <stdexcept>
 #include "epoch.hpp"
-
-#ifndef COMMON_HPP
-#define COMMON_HPP
-#endif
 
 class my_mutex
 {

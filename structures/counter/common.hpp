@@ -1,13 +1,6 @@
+#pragma once
 
-
-#ifndef COMMON_HPP
-#define COMMON_HPP
 #include "../common.hpp"
-#endif
-
-#ifndef COUNTER_COMMON_HPP
-#define COUNTER_COMMON_HPP
-#endif
 
 struct RunResult
 {

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <atomic>
 #include <vector>
 #include <queue>
@@ -9,7 +11,7 @@
 #include "./common.hpp"
 #endif
 
-namespace STUMP_COUNTER
+namespace SIMPLE_AGG_FUNNEL
 {
 
     struct alignas(128) RandomGenerator
@@ -31,7 +33,7 @@ namespace STUMP_COUNTER
     };
 
     template <typename T>
-    class alignas(1024) StumpCounter : public Counter<T>
+    class alignas(1024) SimpleAggFunnelsCounter : public Counter<T>
     {
     private:
         struct alignas(32) MappingListNode
@@ -89,10 +91,10 @@ namespace STUMP_COUNTER
         }
 
     public:
-        StumpCounter() {}
-        ~StumpCounter() { delete ebr; }
-        StumpCounter(int thread_count) : StumpCounter(0, thread_count) {}
-        StumpCounter(T start, int thread_count)
+        SimpleAggFunnelsCounter() {}
+        ~SimpleAggFunnelsCounter() { delete ebr; }
+        SimpleAggFunnelsCounter(int thread_count) : SimpleAggFunnelsCounter(0, thread_count) {}
+        SimpleAggFunnelsCounter(T start, int thread_count)
         {
             init(start, thread_count);
         }

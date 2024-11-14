@@ -1,13 +1,12 @@
+#pragma once
+
 #include <atomic>
 
-#ifndef COUNTER_COMMON_HPP
-#define COUNTER_COMMON_HPP
 #include "./common.hpp"
-#endif
 #include <stack>
 #include <mutex>
 
-namespace COMBINING_FUNNEL_COUNTER
+namespace COMB_FUNNEL
 {
     struct alignas(128) ThreadLocalData
     {
@@ -15,7 +14,7 @@ namespace COMBINING_FUNNEL_COUNTER
     };
 
     template <typename T>
-    class alignas(1024) CombiningFunnelCounter : public Counter<T>
+    class alignas(1024) CombiningFunnelsCounter : public Counter<T>
     {
     private:
     public:
@@ -65,8 +64,8 @@ namespace COMBINING_FUNNEL_COUNTER
         int PADDING_4[32] = {};
 
     public:
-        CombiningFunnelCounter(int thread_count) : CombiningFunnelCounter(0, thread_count) {}
-        CombiningFunnelCounter(T start, int thread_count)
+        CombiningFunnelsCounter(int thread_count) : CombiningFunnelsCounter(0, thread_count) {}
+        CombiningFunnelsCounter(T start, int thread_count)
         {
             this->thread_count = thread_count;
             aux_data.resize(thread_count);

@@ -14,7 +14,7 @@
 #include <queue>
 #include <iomanip>
 
-#include "bench/benchmarkUtils.hpp"
+#include "../bench/benchmarkUtils.hpp"
 
 void simple_test()
 {

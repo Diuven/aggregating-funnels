@@ -4,25 +4,14 @@
 #include <string>
 #include <iostream>
 
-#ifndef COUNTER_COMMON_HPP
-#define COUNTER_COMMON_HPP
 #include "./common.hpp"
-#endif
+#include "./simpleAggregatingFunnelsCounter.hpp"
+#include "./hardwareCounter.hpp"
 
-#ifndef STUMP_COUNTER_HPP
-#define STUMP_COUNTER_HPP
-#include "stumpCounter.hpp"
-#endif
-
-#ifndef SIMPLE_ATOMIC_COUNTER_HPP
-#define SIMPLE_ATOMIC_COUNTER_HPP
-#include "simpleAtomicCounter.hpp"
-#endif
-
-namespace NESTED_STUMP_COUNTER
+namespace RECURSIVE_AGG_FUNNEL
 {
     template <typename T>
-    class NestedStumpCounter : public Counter<T>
+    class RecursiveAggFunnelsCounter : public Counter<T>
     {
     private:
         struct alignas(32) MappingListNode
@@ -41,7 +30,7 @@ namespace NESTED_STUMP_COUNTER
             ~Node() { delete mapping_list.load(); }
         };
 
-        alignas(1024) STUMP_COUNTER::StumpCounter<T> main_counter;
+        alignas(1024) SIMPLE_AGG_FUNNEL::SimpleAggFunnelsCounter<T> main_counter;
         int PADDING_1[32] = {};
 
         Node child[64]; // Max thread count is 64*64=4096
@@ -64,9 +53,9 @@ namespace NESTED_STUMP_COUNTER
             }
             return root_fanout;
         }
-        NestedStumpCounter(int thread_count) : NestedStumpCounter(0, thread_count) {}
-        ~NestedStumpCounter() { delete ebr; }
-        NestedStumpCounter(T start, int thread_count)
+        RecursiveAggFunnelsCounter(int thread_count) : RecursiveAggFunnelsCounter(0, thread_count) {}
+        ~RecursiveAggFunnelsCounter() { delete ebr; }
+        RecursiveAggFunnelsCounter(T start, int thread_count)
         {
             this->thread_count = thread_count;
             ebr = new EpochBasedReclamation<MappingListNode>(thread_count);

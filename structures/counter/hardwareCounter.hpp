@@ -1,3 +1,5 @@
+#pragma once
+
 #include <atomic>
 
 #ifndef COUNTER_COMMON_HPP
@@ -5,7 +7,7 @@
 #include "./common.hpp"
 #endif
 
-namespace SIMPLE_ATOMIC_COUNTER
+namespace HARDWARE_ATOMIC
 {
     struct ThreadLocalData
     {
@@ -13,7 +15,7 @@ namespace SIMPLE_ATOMIC_COUNTER
     };
 
     template <typename T>
-    class alignas(1024) SimpleAtomicCounter : public Counter<T>
+    class alignas(1024) HardwareCounter : public Counter<T>
     {
     private:
         int PADDING_1[32];
@@ -22,12 +24,12 @@ namespace SIMPLE_ATOMIC_COUNTER
         std::vector<ThreadLocalData> aux_data;
 
     public:
-        SimpleAtomicCounter() : val(0) {}
-        SimpleAtomicCounter(int thread_count) : val(0)
+        HardwareCounter() : val(0) {}
+        HardwareCounter(int thread_count) : val(0)
         {
             aux_data.resize(thread_count);
         }
-        SimpleAtomicCounter(T start, int thread_count) : val(start)
+        HardwareCounter(T start, int thread_count) : val(start)
         {
             aux_data.resize(thread_count);
         }
