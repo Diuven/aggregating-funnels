@@ -26,7 +26,7 @@ raw names under date-time (up to mins)
 
 3. Run the docker container
 
-   - `docker run -v .:/home/ubuntu/project -it --privileged aggfunnel`
+   - `docker run -v .:/home/ubuntu/project -it --privileged --network=host aggfunnel`
 
 4. Run the benchmark
 

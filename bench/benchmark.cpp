@@ -240,7 +240,7 @@ int main(int argc, char const *argv[])
 
     // write main data
     std::cout << "Writing to results_counter.csv" << std::endl;
-    std::ofstream summary_file("results_counter.csv", std::ios::app);
+    std::ofstream summary_file("results/counter_main.csv", std::ios::app);
     // thread_count, run_milliseconds, read_percent, increment_percent, additional_work, total_count, elapsed_time, max_access_ratio, root_access_ratio, fairness, stddev, throughput
     summary_file << thread_count << "," << run_milliseconds << "," << read_percent << "," << increment_percent << "," << additional_work;
     summary_file << "," << total_count << "," << ms << "," << (double)max_access / total_update_count << "," << (double)root_access / total_update_count << "," << (double)min_throughput / max_throughput << "," << std_dev << "," << (double)total_count / timer.elapsed() << std::endl;
@@ -248,7 +248,7 @@ int main(int argc, char const *argv[])
 
     // write aux data
     std::cout << "Writing to results_aux.csv" << std::endl;
-    std::ofstream aux_file("results_aux.csv");
+    std::ofstream aux_file("results/counter_aux.csv");
     aux_file << "thread_id,read_count,inc_count,total_count,loop_count_1,loop_count_2,root_access" << std::endl;
     for (int i = 0; i < thread_count; i++)
     {

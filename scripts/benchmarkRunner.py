@@ -3,6 +3,7 @@ import os
 import argparse
 import subprocess
 import datetime
+import json
 
 from benchmarkDigester import save_digest
 
@@ -158,153 +159,116 @@ def run_single_counter_model(
     return results
 
 
-def get_args():
-    parser = argparse.ArgumentParser(description="Run benchmarks")
-    parser.add_argument(
-        "--counter", action="store_true", help="Run counter benchmark", required=True
-    )
-    parser.add_argument(
-        "--model_types",
-        "-m",
-        nargs="+",
-        type=str,
-        # choices=model_choices["counter"],
-        help="Target model name to make and run",
-    )
-    parser.add_argument(
-        "--all_models",
-        "-a",
-        action="store_true",
-        help="Run all models",
-    )
-    parser.add_argument(
-        "--max_threads", type=int, help="Maximum number of threads (run presets)"
-    )
-    parser.add_argument(
-        "--threads", "-t", type=int, nargs="*", help="Number of threads"
-    )
-    parser.add_argument(
-        "--single_socket", action="store_true", help="Run on single socket"
-    )
-    parser.add_argument(
-        "--malloc", default=default_malloc_path, help="Path to malloc library"
-    )
-    parser.add_argument(
-        "--reps", default=default_reps, type=int, help="Number of repetitions"
-    )
-    parser.add_argument(
-        "--milliseconds",
-        default=default_milliseconds,
-        type=int,
-        help="Number of milliseconds to run the benchmark",
-    )
-    parser.add_argument(
-        "--note", type=str, help="Note to add to the save file", default=""
-    )
-    parser.add_argument(
-        "--no_digest", action="store_true", help="Do not save summary and plotdata"
-    )
-    parser.add_argument("--no_save", action="store_true", help="Do not save raw data")
-    parser.add_argument("--local", action="store_true", help="Run on local machine")
-    input_args = parser.parse_args()
-
-    # Prepare
-    # Benchmark type should be given
-    if not input_args.counter:
-        raise ValueError("Provide benchmark type")
-
-    if (input_args.threads and input_args.max_threads) or (
-        not input_args.threads and not input_args.max_threads
-    ):
-        raise ValueError("Provide either threads or max_threads")
-
-    if (input_args.all_models and input_args.model_types) or (
-        not input_args.all_models and not input_args.model_types
-    ):
-        raise ValueError("Provide either model_types or all_models")
-
-    if not input_args.local and not os.path.exists(input_args.malloc):
-        raise FileNotFoundError("Malloc library not found")
-
-    # if any(
-    #     not any(option in model_type for option in model_choices["counter"])
-    #     for model_type in input_args.model_types
-    # ):
-    #     raise ValueError("Invalid model name")
-
-    if input_args.all_models:
-        # input_args.model_types = model_choices["counter"]
-        input_args.model_types = [
-            "fixedStumpCounter_6_0_0",
-            "nestedStumpCounter",
-            "combiningFunnelCounter",
-            "simpleAtomicCounter",
-        ]
-    return input_args
-
-
 def main():
-    input_args = get_args()
-    date_str = datetime.datetime.now().strftime("%Y%m%dT%H")
+    task_path = "./local/task.json"
+    task_info = json.load(open(task_path, "r"))
+    datetime_str = datetime.datetime.now().strftime("%Y%m%dT%H")
+
+    print(task_info["save_path"])
+    save_path = task_info["save_path"].format(datetime_str=datetime_str)
+    build_format = task_info["build_format"]
+    exec_format = task_info["exec_format"]
+    reps = task_info["repetition"]
+    threads_list = task_info["threads_list"]
+    trials = task_info["trials"]
+
+    # make save_path
+    os.makedirs(save_path, exist_ok=True)
 
     # Run
-    if input_args.counter:
-        print("Running counter benchmark for models: ", input_args.model_types)
+    print(f"Running benchmark for models: {task_path}, save at {save_path}")
 
-        summary_results = {}
-        run_threads = (
-            thread_counts[input_args.max_threads]
-            if input_args.max_threads
-            else input_args.threads
-        )
-        exec_format = (
-            single_exec_format if input_args.single_socket else interleave_exec_format
-        )
-        if input_args.local:
-            exec_format = "{exec_path} {threads} {milliseconds} {params} 2> /dev/null"
+    summary_results = {}
+    total_exec = reps * len(threads_list) * len(trials)
+    ms = int(task_info["exec_format"].split(" ")[-4])
+    total_min = total_exec * ms / 1000 / 60
+    print(f"Estimated total execution time: {total_min} minutes for {total_exec} runs")
 
-        for model_type in input_args.model_types:
-            result_buffer_path = fixed_params_dict["counter"]["result_buffer_path"]
-            if os.path.exists(result_buffer_path):
-                os.rename(
-                    result_buffer_path,
-                    result_buffer_path + f"_existed_{date_str}_{input_args.note}.csv",
+    for trial in trials:
+        model_type = trial["model_type"]
+        build_params = trial["build_params"]
+        exec_params = trial["exec_params"]
+
+        build_command = build_format.format(
+            model_type=model_type, build_params=build_params
+        )
+        print(f"Building {model_type} with {build_params}")
+        subprocess.run(build_command, shell=True, check=True)
+
+        for th in threads_list:
+            for i in range(reps):
+                exec_command = exec_format.format(
+                    threads=th,
+                    exec_params=exec_params,
                 )
-            model_results = run_single_counter_model(
-                model_type,
-                run_threads,
-                date_str,
-                exec_format,
-                input_args.malloc,
-                input_args.milliseconds,
-                input_args.reps,
-                input_args.no_save,
-                input_args.note,
-            )
-            print(model_results)
-            with open(
-                f"results/counter/{date_str}/tmp_summary_{model_type}.csv", "w"
-            ) as f:
-                for detail_arg, detail_results in model_results.items():
-                    for thread, throughput in detail_results.items():
-                        f.write(f"{detail_arg},{thread},{throughput}\n")
-                    f.write("\n")
-            summary_results[model_type.replace("Counter", "")] = model_results
+                print(f"Running {model_type} with {th} threads, rep {i+1}")
+                subprocess.run(exec_command, shell=True, check=True)
+                # read data(aux, main) and save it in df and tmp cache
 
-        # Save summary
-        if not input_args.no_digest:
-            save_digest_path_prefix = os.path.join(
-                fixed_params_dict["counter"]["result_save_path_prefix"],
-                date_str,
-                "digest",
-            )
-            save_digest(
-                summary_results,
-                save_digest_path_prefix,
-                note=input_args.note,
-            )
+        print(f"Done with {trial}")
 
-        print("Done with all models\n\n")
+    #     results = run_single_counter_model(
+    #         model_type,
+    #         threads_list,
+    #         build_format,
+    #         exec_format,
+    #         reps,
+    #         exec_params,
+    #         save_path,
+    #     )
+    #     summary_results[model_type] = results
+
+    # run_threads = (
+    #     thread_counts[input_args.max_threads]
+    #     if input_args.max_threads
+    #     else input_args.threads
+    # )
+    # exec_format = (
+    #     single_exec_format if input_args.single_socket else interleave_exec_format
+    # )
+    # if input_args.local:
+    #     exec_format = "{exec_path} {threads} {milliseconds} {params} 2> /dev/null"
+
+    # for model_type in input_args.model_types:
+    #     result_buffer_path = fixed_params_dict["counter"]["result_buffer_path"]
+    #     if os.path.exists(result_buffer_path):
+    #         os.rename(
+    #             result_buffer_path,
+    #             result_buffer_path + f"_existed_{date_str}_{input_args.note}.csv",
+    #         )
+    #     model_results = run_single_counter_model(
+    #         model_type,
+    #         run_threads,
+    #         date_str,
+    #         exec_format,
+    #         input_args.malloc,
+    #         input_args.milliseconds,
+    #         input_args.reps,
+    #         input_args.no_save,
+    #         input_args.note,
+    #     )
+    #     print(model_results)
+    #     with open(f"results/counter/{date_str}/tmp_summary_{model_type}.csv", "w") as f:
+    #         for detail_arg, detail_results in model_results.items():
+    #             for thread, throughput in detail_results.items():
+    #                 f.write(f"{detail_arg},{thread},{throughput}\n")
+    #             f.write("\n")
+    #     summary_results[model_type.replace("Counter", "")] = model_results
+
+    # Save summary
+    # if not input_args.no_digest:
+    #     save_digest_path_prefix = os.path.join(
+    #         fixed_params_dict["counter"]["result_save_path_prefix"],
+    #         date_str,
+    #         "digest",
+    #     )
+    #     save_digest(
+    #         summary_results,
+    #         save_digest_path_prefix,
+    #         note=input_args.note,
+    #     )
+
+    print("Done with all models\n\n")
 
 
 if __name__ == "__main__":

@@ -1087,7 +1087,8 @@ dkms.conf
 results*
 results/
 build/
-local/
+local/*
+!local/example.json
 local_run.sh
 
 .venv/

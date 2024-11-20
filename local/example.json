@@ -1,0 +1,49 @@
+{
+  "save_path": "counter/{datetime_str}__test/",
+  "build_format": "make {model_type} {build_params}",
+  "exec_format": "./build/counter_benchmark {threads} 1000 {exec_params} 2> /dev/null",
+  "repetition": 3,
+  "threads_list": [1, 2, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64],
+  "trials": [
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    }
+  ]
+}
