@@ -8,74 +8,54 @@
   ],
   "trials": [
     {
-      "model_type": "hardwareCounter",
-      "build_params": "",
-      "exec_params": "10 90 512"
-    },
-    {
-      "model_type": "hardwareCounter",
-      "build_params": "",
-      "exec_params": "0 100 512"
-    },
-    {
-      "model_type": "hardwareCounter",
-      "build_params": "",
-      "exec_params": "50 50 512"
-    },
-    {
-      "model_type": "hardwareCounter",
-      "build_params": "",
-      "exec_params": "90 10 512"
-    },
-    {
-      "model_type": "hardwareCounter",
-      "build_params": "",
-      "exec_params": "10 90 32"
-    },
-    {
-      "model_type": "aggFunnelCounter",
-      "build_params": "",
-      "exec_params": "10 90 512"
-    },
-    {
-      "model_type": "aggFunnelCounter",
-      "build_params": "",
-      "exec_params": "0 100 512"
-    },
-    {
-      "model_type": "aggFunnelCounter",
-      "build_params": "",
-      "exec_params": "50 50 512"
-    },
-    {
-      "model_type": "aggFunnelCounter",
-      "build_params": "",
-      "exec_params": "90 10 512"
-    },
-    {
       "model_type": "aggFunnelCounter",
       "build_params": "",
       "exec_params": "10 90 32"
     },
     {
-      "model_type": "recursiveAggFunnelCounter",
+      "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "0 100 32"
     },
     {
-      "model_type": "recursiveAggFunnelCounter",
+      "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "0 100 512"
+      "exec_params": "50 50 32"
     },
     {
-      "model_type": "recursiveAggFunnelCounter",
+      "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "50 50 512"
+      "exec_params": "90 10 32"
     },
     {
-      "model_type": "recursiveAggFunnelCounter",
+      "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "10 90 4"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 32"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "0 100 32"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "50 50 32"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 32"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 4"
     },
     {
       "model_type": "recursiveAggFunnelCounter",
@@ -83,29 +63,49 @@
       "exec_params": "10 90 32"
     },
     {
-      "model_type": "combFunnelCounter",
+      "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "0 100 32"
     },
     {
-      "model_type": "combFunnelCounter",
+      "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "0 100 512"
+      "exec_params": "50 50 32"
     },
     {
-      "model_type": "combFunnelCounter",
+      "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "50 50 512"
+      "exec_params": "90 10 32"
     },
     {
-      "model_type": "combFunnelCounter",
+      "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "10 90 4"
     },
     {
-      "model_type": "combFunnelCounter",
+      "model_type": "hardwareCounter",
       "build_params": "",
       "exec_params": "10 90 32"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "0 100 32"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "50 50 32"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "90 10 32"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "10 90 4"
     }
   ]
 }

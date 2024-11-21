@@ -59,6 +59,7 @@ def generate_threads_list(max_thread):
 
 
 def get_exec_param(write_percent, additional_work):
+    # additional work=32 -> 32 iterations -> 512 additaional cycles
     if not 0 <= write_percent <= 100:
         raise ValueError("write_percent should be between 0 and 100")
     return f"{100-write_percent} {write_percent} {additional_work}"
@@ -131,39 +132,39 @@ def trials_preset_figure3():
     res_list = []
     # confRootAggFunnelCounter
     build_params = "DIRECT_COUNT=0 AUX_DATA=1"
-    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 90, 512))
-    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 50, 512))
+    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 90, 32))
+    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 50, 32))
 
     # configuredAggFunnelCounter
     for agg_count in [4, 6, 8, 10]:
         build_params = f"AGG_COUNT={agg_count} DIRECT_COUNT=0 AUX_DATA=1"
         res_list.append(
-            get_single_trial("configuredAggFunnelCounter", build_params, 90, 512)
+            get_single_trial("configuredAggFunnelCounter", build_params, 90, 32)
         )
         res_list.append(
-            get_single_trial("configuredAggFunnelCounter", build_params, 50, 512)
+            get_single_trial("configuredAggFunnelCounter", build_params, 50, 32)
         )
 
     # hardwareCounter
-    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 512))
-    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 50, 512))
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 32))
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 50, 32))
 
     return res_list
 
 
 def trials_preset_figure4():
     models_fig4 = [
-        "hardwareCounter",
         "aggFunnelCounter",
-        "recursiveAggFunnelCounter",
         "combFunnelCounter",
+        "recursiveAggFunnelCounter",
+        "hardwareCounter",
     ]
     exec_params_fig4 = [
-        (90, 512),
-        (100, 512),
-        (50, 512),
-        (10, 512),
         (90, 32),
+        (100, 32),
+        (50, 32),
+        (10, 32),
+        (90, 4),
     ]
 
     res_list = []
@@ -184,11 +185,11 @@ def trials_preset_figure5():
                 f"AGG_COUNT={agg_count} DIRECT_COUNT={direct_count} AUX_DATA=1"
             )
             res_list.append(
-                get_single_trial("configuredAggFunnelCounter", build_params, 90, 32)
+                get_single_trial("configuredAggFunnelCounter", build_params, 90, 4)
             )
 
     # hardwareCounter
-    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 512))
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 4))
     return res_list
 
 

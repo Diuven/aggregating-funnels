@@ -10,62 +10,62 @@
     {
       "model_type": "confRootAggFunnelCounter",
       "build_params": "DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "confRootAggFunnelCounter",
       "build_params": "DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=4 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=4 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=6 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=6 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=8 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=8 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=10 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=10 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     },
     {
       "model_type": "hardwareCounter",
       "build_params": "AUX_DATA=1",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "hardwareCounter",
       "build_params": "AUX_DATA=1",
-      "exec_params": "50 50 512"
+      "exec_params": "50 50 32"
     }
   ]
 }

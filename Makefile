@@ -4,13 +4,14 @@ CC = g++
 CFLAGS = -std=c++17 -fdiagnostics-color=always -O3 -pthread
 LDFLAGS = 
 DEBUGFLAGS = -g
-MACROFLAGS = 
 
 # Structural settings
 COUNTER_TYPE ?= emptyCounter
 DIRECT_COUNT ?= 0
 AGG_COUNT ?= -1
 AUX_DATA ?= 0
+
+MACROFLAGS = -DAUX_DATA=$(AUX_DATA)
 
 counterBenchmark:
 	mkdir -p build
@@ -36,14 +37,14 @@ aggFunnelCounter: counterBenchmark
 aggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER
 aggFunnelCounterTest: counterTest
 
-configuredAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT) -DAUX_DATA=$(AUX_DATA)
+configuredAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT) 
 configuredAggFunnelCounter: counterBenchmark
-configuredAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT) -DAUX_DATA=$(AUX_DATA)
+configuredAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT)
 configuredAggFunnelCounterTest: counterTest
 
-confRootAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_ROOT_AGGS -DDIRECT_COUNT=$(DIRECT_COUNT) -DAUX_DATA=$(AUX_DATA)
+confRootAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_ROOT_AGGS -DDIRECT_COUNT=$(DIRECT_COUNT)
 confRootAggFunnelCounter: counterBenchmark
-confRootAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_ROOT_AGGS -DDIRECT_COUNT=$(DIRECT_COUNT) -DAUX_DATA=$(AUX_DATA)
+confRootAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_ROOT_AGGS -DDIRECT_COUNT=$(DIRECT_COUNT)
 confRootAggFunnelCounterTest: counterTest
 
 recursiveAggFunnelCounter: MACROFLAGS += -DUSE_RECURSIVE_AGG_COUNTER
