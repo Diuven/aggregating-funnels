@@ -52,7 +52,7 @@ namespace HARDWARE_ATOMIC
 
         T fetch_add(T diff, int thread_id)
         {
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
             aux_data[thread_id].inc_count++;
 #endif
             return val.fetch_add(diff);

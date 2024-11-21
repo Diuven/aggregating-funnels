@@ -157,6 +157,19 @@ def trials_preset_figure4():
 
 def trials_preset_figure5():
     res_list = []
+    # configured aggFunnelCounter
+    for agg_count in [2, 6]:
+        for direct_count in [0, 1, 2]:
+            build_params = (
+                f"AGG_COUNT={agg_count} DIRECT_COUNT={direct_count} AUX_DATA=1"
+            )
+            res_list.append(
+                get_single_trial("configuredAggFunnelCounter", build_params, 90, 32)
+            )
+
+    # hardwareCounter
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 512))
+    return res_list
 
 
 def main():
@@ -176,6 +189,8 @@ def main():
     task_info["trials"] = []
     if preset == "figure4":
         task_info["trials"] = trials_preset_figure4()
+    elif preset == "figure5":
+        task_info["trials"] = trials_preset_figure5()
     else:
         raise ValueError(f"Unknown preset {preset}")
 

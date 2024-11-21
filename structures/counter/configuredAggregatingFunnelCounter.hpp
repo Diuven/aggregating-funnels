@@ -199,7 +199,7 @@ namespace CONFIGURED_AGG_FUNNEL
             MappingListNode *mapping = child->mapping_list.load();
             while (mapping->child_from > my_child_from)
             {
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
                 aux_data[thread_id].loop_count_2++;
 #endif
                 mapping = mapping->prev;
@@ -215,7 +215,7 @@ namespace CONFIGURED_AGG_FUNNEL
             int nd_idx = starting_node[thread_id];
             if (nd_idx < 0)
             {
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
                 aux_data[thread_id].root_access++;
 #endif
                 return counter.fetch_add(diff);
@@ -227,7 +227,7 @@ namespace CONFIGURED_AGG_FUNNEL
             T next_from = child->sent.load();
             while (next_from < child_from)
             {
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
                 aux_data[thread_id].loop_count_1++;
 #endif
                 next_from = child->sent.load();
@@ -239,7 +239,7 @@ namespace CONFIGURED_AGG_FUNNEL
                 // I should do the work
                 T child_to = child->count.load();
                 root_from = update(child, child_from, child_to, thread_id);
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
                 aux_data[thread_id].access_count[nd_idx]++;
                 aux_data[thread_id].root_access++;
 #endif
@@ -248,7 +248,7 @@ namespace CONFIGURED_AGG_FUNNEL
             {
                 // Mine is already done
                 root_from = get_my_root(child, child_from, thread_id);
-#ifndef NO_AUX_DATA
+#if defined(AUX_DATA) && AUX_DATA != 0
                 aux_data[thread_id].access_count[nd_idx]++;
 #endif
             }

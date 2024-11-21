@@ -3,11 +3,23 @@ import subprocess
 import datetime
 import json
 import pandas as pd
+import argparse
+from pprint import pprint
 
 
 def main():
-    task_path = "./local/task.json"
-    task_path = input(f"Enter task path (default: {task_path}): ") or task_path
+    # get task_path from argparse. if none given, use default
+    # task
+    parser = argparse.ArgumentParser(description="Run benchmark")
+    parser.add_argument(
+        "--task_path",
+        type=str,
+        default="./local/task.json",
+        help="Path to the task file",
+    )
+    args = parser.parse_args()
+
+    task_path = args.task_path
     task_info = json.load(open(task_path, "r"))
     datetime_str = datetime.datetime.now().strftime("%Y%m%dT%H")
 
@@ -17,6 +29,19 @@ def main():
     reps = task_info["repetition"]
     threads_list = task_info["threads_list"]
     trials = task_info["trials"]
+
+    print("Running benchmark with the following parameters:")
+    pprint(
+        {
+            "save_path": save_path,
+            "build_format": build_format,
+            "exec_format": exec_format,
+            "reps": reps,
+            "threads_list": threads_list,
+            "trial_example": trials[0],
+        },
+    )
+    input("Press Enter to continue...")
 
     # make save_path
     os.makedirs(save_path, exist_ok=True)
@@ -40,7 +65,7 @@ def main():
             model_type=model_type, build_params=build_params
         )
         print(f"Building {model_type} with {build_params}")
-        subprocess.run(build_command, shell=True, check=True)
+        subprocess.run(build_command.strip().split(" "), check=True)
 
         for th in threads_list:
             for i in range(reps):
