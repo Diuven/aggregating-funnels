@@ -1,0 +1,111 @@
+{
+  "save_path": "./results/counter/{datetime_str}__figure4/",
+  "build_format": "make {model_type} {build_params}",
+  "exec_format": "LD_PRELOAD=/usr/local/lib/libmimalloc.so numactl -i all ./build/counter_benchmark {threads} 2000 {exec_params} 2> /dev/null",
+  "repetition": 5,
+  "threads_list": [
+    1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176
+  ],
+  "trials": [
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "0 100 512"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "50 50 512"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "hardwareCounter",
+      "build_params": "",
+      "exec_params": "10 90 32"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "0 100 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "50 50 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "aggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 32"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "0 100 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "50 50 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "recursiveAggFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 32"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "0 100 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "50 50 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "90 10 512"
+    },
+    {
+      "model_type": "combFunnelCounter",
+      "build_params": "",
+      "exec_params": "10 90 32"
+    }
+  ]
+}

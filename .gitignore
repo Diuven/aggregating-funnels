@@ -1089,6 +1089,7 @@ results/
 build/
 local/*
 !local/example.json
+!local/preset_*.json
 local_run.sh
 
 .venv/

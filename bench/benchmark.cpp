@@ -240,8 +240,8 @@ int main(int argc, char const *argv[])
 
     // write main data
     std::cout << "Writing to results_counter.csv" << std::endl;
-    std::ofstream summary_file("results/counter_main.csv", std::ios::app);
-    // thread_count, run_milliseconds, read_percent, increment_percent, additional_work, total_count, elapsed_time, max_access_ratio, root_access_ratio, fairness, stddev, throughput
+    std::ofstream summary_file("results/counter_main.csv");
+    summary_file << "thread_count,run_milliseconds,read_percent,increment_percent,additional_work,total_count,elapsed_time,max_access_ratio,root_access_ratio,fairness,stddev,throughput" << std::endl;
     summary_file << thread_count << "," << run_milliseconds << "," << read_percent << "," << increment_percent << "," << additional_work;
     summary_file << "," << total_count << "," << ms << "," << (double)max_access / total_update_count << "," << (double)root_access / total_update_count << "," << (double)min_throughput / max_throughput << "," << std_dev << "," << (double)total_count / timer.elapsed() << std::endl;
     summary_file.close();

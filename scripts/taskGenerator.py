@@ -1,8 +1,9 @@
 import json
+import os
 
 
 def generate_save_path(note):
-    res = "counter/{datetime_str}__"
+    res = "./results/counter/{datetime_str}__"
     res += f"{note}/"
     return res
 
@@ -19,6 +20,21 @@ def generate_full_exec_format(malloc_path, exec_path, milliseconds):
 def generate_simple_exec_format(exec_path, milliseconds):
     # "{exec_path} {threads} {milliseconds} {exec_params} 2> /dev/null"
     res = f"{exec_path} "
+    res += "{threads} "
+    res += f"{milliseconds} "
+    res += "{exec_params} 2> /dev/null"
+    return res
+
+
+def generate_exec_format(exec_path, milliseconds, use_numa, malloc_path):
+    # "LD_PRELOAD={malloc_path} numactl -i all {exec_path} {threads} {milliseconds} {exec_params} 2> /dev/null"
+    res = ""
+    if malloc_path is not None and malloc_path != "":
+        res = f"LD_PRELOAD={malloc_path} "
+    if use_numa:
+        res += "numactl -i all "
+
+    res += f"{exec_path} "
     res += "{threads} "
     res += f"{milliseconds} "
     res += "{exec_params} 2> /dev/null"
@@ -56,47 +72,112 @@ def get_single_trial(model_type, build_params, write_percent, additional_work):
     }
 
 
-model_type_list = [
-    "hardwareCounter",
-    "aggFunnelCounter",
-    "recursiveAggFunnelCounter",
-    "combFunnelCounter",
-]
-exec_params_list = [
-    (90, 512),
-    (100, 512),
-    (50, 512),
-    (10, 512),
-    (90, 32),
-]
+def prompt(default, prompt_str):
+    res = input(f"{prompt_str} (default: {default}): ")
+    if res == "":
+        return default
+    return res
+
+
+def ask_for_input():
+    is_numa = os.system("numactl --show > /dev/null 2>&1") == 0
+    print(f"NUMA availability: {is_numa}")
+
+    def_malloc_path = "/usr/local/lib/libmimalloc.so"
+    # check if malloc default path is valid
+    if not os.path.exists(def_malloc_path):
+        print(f"Default malloc path {def_malloc_path} does not exist")
+        def_malloc_path = ""
+    else:
+        print(f"MiMalloc detected: {def_malloc_path}")
+
+    def_max_threads = str(os.cpu_count())
+    print(f"Available threads: {def_max_threads}")
+
+    use_numa = prompt("yes" if is_numa else "no", "Use NUMA").lower() in ["y", "yes"]
+    use_malloc = prompt(
+        "yes" if def_malloc_path != "" else "no", "Use custom malloc"
+    ).lower() in ["y", "yes"]
+    if not use_malloc:
+        malloc_path = ""
+    else:
+        malloc_path = prompt(def_malloc_path, f"Malloc path")
+    exec_path = prompt("./build/counter_benchmark", "Executable path")
+    max_threads = int(prompt(def_max_threads, f"Max threads"))
+    reps = int(prompt("5", "Repetitions"))
+    ms = int(prompt("2000", "Milliseconds"))
+    preset = prompt("figure4", "Preset")
+    task_path = prompt("./local/task.json", "Resulting task path")
+    note = prompt(preset, "Note")
+
+    # check if malloc path is valid
+    if malloc_path != "" and not os.path.exists(malloc_path):
+        raise ValueError(f"Invalid malloc path {malloc_path}")
+
+    return (
+        use_numa,
+        malloc_path,
+        exec_path,
+        max_threads,
+        reps,
+        ms,
+        preset,
+        task_path,
+        note,
+    )
+
+
+def trials_preset_figure3():
+    res_list = []
+
+
+def trials_preset_figure4():
+    models_fig4 = [
+        "hardwareCounter",
+        "aggFunnelCounter",
+        "recursiveAggFunnelCounter",
+        "combFunnelCounter",
+    ]
+    exec_params_fig4 = [
+        (90, 512),
+        (100, 512),
+        (50, 512),
+        (10, 512),
+        (90, 32),
+    ]
+
+    res_list = []
+    for model_type in models_fig4:
+        for exec_params in exec_params_fig4:
+            res_list.append(
+                get_single_trial(model_type, "", exec_params[0], exec_params[1])
+            )
+    return res_list
+
+
+def trials_preset_figure5():
+    res_list = []
 
 
 def main():
-    note = "test"
-    full_exec = True
-    malloc_path = "/usr/local/lib/libmimalloc.so"
-    exec_path = "./build/counter_benchmark"
-    max_threads = 196
-    reps = 5
-    ms = 2000
-    task_path = "./local/task.json"
+    use_numa, malloc_path, exec_path, max_threads, reps, ms, preset, task_path, note = (
+        ask_for_input()
+    )
 
     task_info = {}
     task_info["save_path"] = generate_save_path(note)
     task_info["build_format"] = "make {model_type} {build_params}"
-    if full_exec:
-        task_info["exec_format"] = generate_full_exec_format(malloc_path, exec_path, ms)
-    else:
-        task_info["exec_format"] = generate_simple_exec_format(exec_path, 1000)
+    task_info["exec_format"] = generate_exec_format(
+        exec_path, ms, use_numa, malloc_path
+    )
     task_info["repetition"] = reps
     task_info["threads_list"] = generate_threads_list(max_threads)
 
     task_info["trials"] = []
-    for model_type in model_type_list:
-        for exec_params in exec_params_list:
-            task_info["trials"].append(
-                get_single_trial(model_type, "", exec_params[0], exec_params[1])
-            )
+    if preset == "figure4":
+        task_info["trials"] = trials_preset_figure4()
+    else:
+        raise ValueError(f"Unknown preset {preset}")
 
     total_exec = reps * len(task_info["threads_list"]) * len(task_info["trials"])
     total_min = total_exec * ms / 1000 / 60
