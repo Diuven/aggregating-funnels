@@ -129,6 +129,26 @@ def ask_for_input():
 
 def trials_preset_figure3():
     res_list = []
+    # confRootAggFunnelCounter
+    build_params = "DIRECT_COUNT=0 AUX_DATA=1"
+    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 90, 512))
+    res_list.append(get_single_trial("confRootAggFunnelCounter", build_params, 50, 512))
+
+    # configuredAggFunnelCounter
+    for agg_count in [4, 6, 8, 10]:
+        build_params = f"AGG_COUNT={agg_count} DIRECT_COUNT=0 AUX_DATA=1"
+        res_list.append(
+            get_single_trial("configuredAggFunnelCounter", build_params, 90, 512)
+        )
+        res_list.append(
+            get_single_trial("configuredAggFunnelCounter", build_params, 50, 512)
+        )
+
+    # hardwareCounter
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 512))
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 50, 512))
+
+    return res_list
 
 
 def trials_preset_figure4():
@@ -187,7 +207,9 @@ def main():
     task_info["threads_list"] = generate_threads_list(max_threads)
 
     task_info["trials"] = []
-    if preset == "figure4":
+    if preset == "figure3":
+        task_info["trials"] = trials_preset_figure3()
+    elif preset == "figure4":
         task_info["trials"] = trials_preset_figure4()
     elif preset == "figure5":
         task_info["trials"] = trials_preset_figure5()

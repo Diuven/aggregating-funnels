@@ -118,25 +118,19 @@ namespace CONFIGURED_AGG_FUNNEL
             int direct = 0;
 #endif
 
+#if defined(AGG_COUNT) && AGG_COUNT > 0
+            int fanout = AGG_COUNT;
+#else
             int fanout = 1;
-
-#ifdef FANOUT_COUNT
-            if (FANOUT_COUNT > 0)
-                fanout = FANOUT_COUNT;
-#endif
-#ifdef GROUP_SIZE
-            if (GROUP_SIZE > 0)
-                fanout = (thread_count + GROUP_SIZE - 1) / GROUP_SIZE;
 #endif
 
-#ifdef USE_DIRECT_ACCESS
+#ifdef USE_ROOT_AGGS
             std::cout << "Using root stump with direct=" << direct << std::endl;
             configure_root_fanout(direct);
-#elif defined USE_FIXED_STUMP
+#elif defined USE_FIXED_AGGS
             std::cout << "Using fixed stump with fanout=" << fanout << " and direct=" << direct << std::endl;
             configure_fixed_fanout(fanout, direct);
 #else
-
             std::cout << "(DEFAULT) Using fixed stump with fanout=" << 6 << " and direct=" << 0 << std::endl;
             configure_fixed_fanout(6, 0);
 #endif
