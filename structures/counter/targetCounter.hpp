@@ -1,7 +1,8 @@
 #include "./hardwareCounter.hpp"
+#include "./aggregatingFunnelCounter.hpp"
 #include "./configuredAggregatingFunnelCounter.hpp"
-#include "./combiningFunnelCounter.hpp"
 #include "./recursiveAggregatingFunnelCounter.hpp"
+#include "./combiningFunnelCounter.hpp"
 
 #ifdef USE_HARDWARE_COUNTER
 #pragma message("Compiling with HardwareCounter")
@@ -10,6 +11,10 @@ typedef HARDWARE_ATOMIC::HardwareCounter<long long> TargetCounter;
 #elif USE_COMBINING_FUNNEL_COUNTER
 #pragma message("Compiling with CombiningFunnelCounter")
 typedef COMB_FUNNEL::CombiningFunnelCounter<long long> TargetCounter;
+
+#elif USE_SIMPLE_AGG_COUNTER
+#pragma message("Compiling with AggFunnelCounter")
+typedef SIMPLE_AGG_FUNNEL::AggFunnelCounter<long long> TargetCounter;
 
 #elif USE_CONFIGURED_AGG_COUNTER
 #pragma message("Compiling with ConfiguredAggFunnelCounter")

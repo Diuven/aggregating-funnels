@@ -2,7 +2,10 @@
 
 #include <atomic>
 #include <stdexcept>
+#include <thread>
 #include "epoch.hpp"
+
+static const int max_thread_count = std::thread::hardware_concurrency();
 
 class my_mutex
 {

@@ -22,9 +22,9 @@ public:
     virtual T load() const;
     virtual void store(T value, std::memory_order order = std::memory_order_seq_cst);
     virtual bool compare_exchange(T &expected, T desired);
-    virtual long long max_access() const;
-    virtual long long root_access() const;
-    virtual void update_aux_data(int thread_id, RunResult &result) const;
+    long long max_access() const;
+    long long root_access() const;
+    void update_aux_data(int thread_id, RunResult &result) const;
 };
 
 template <typename T>

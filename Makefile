@@ -32,9 +32,9 @@ hardwareCounter: counterBenchmark
 hardwareCounterTest: MACROFLAGS += -DUSE_HARDWARE_COUNTER
 hardwareCounterTest: counterTest
 
-aggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER
+aggFunnelCounter: MACROFLAGS += -DUSE_SIMPLE_AGG_COUNTER
 aggFunnelCounter: counterBenchmark
-aggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER
+aggFunnelCounterTest: MACROFLAGS += -DUSE_SIMPLE_AGG_COUNTER
 aggFunnelCounterTest: counterTest
 
 configuredAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT) 

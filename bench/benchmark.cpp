@@ -133,7 +133,9 @@ ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_millisecond
             }
             mirror_counter.fetch_add(count);
             result.random_work = rd_work;
+#if defined(AUX_DATA) && AUX_DATA != 0
             counter->update_aux_data(id, result);
+#endif
             results[id] = result;
         };
 
@@ -163,8 +165,14 @@ ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_millisecond
     std::cout << "Structure gave : " << result << std::endl;
     std::cout << "Verification gave : " << mirror_counter.load() << std::endl;
 
+#if defined(AUX_DATA) && AUX_DATA != 0
     long long max_access = counter->max_access();
     long long root_access = counter->root_access();
+#else
+    long long max_access = 0;
+    long long root_access = 0;
+#endif
+
     std::vector<RunResult> results_vec;
     for (int i = 0; i < thread_count; i++)
     {
