@@ -8,6 +8,9 @@ from pprint import pprint
 
 
 def main():
+    if not os.path.exists("results"):
+        os.makedirs("results")
+                    
     # get task_path from argparse. if none given, use default
     # task
     parser = argparse.ArgumentParser(description="Run benchmark")
