@@ -1,4 +1,4 @@
-# Aggregating Funnels
+# Aggregating Funnels 
 
 - benchmark
   - with different models and settings
