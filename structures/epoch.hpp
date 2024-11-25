@@ -5,6 +5,7 @@
 template <typename T>
 class EpochBasedReclamation
 {
+public:
     struct alignas(512) ThreadLocalSpace
     {
         alignas(64) std::atomic<long long> announcement = -1;

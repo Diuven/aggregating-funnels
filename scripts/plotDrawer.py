@@ -136,13 +136,15 @@ def load_and_normalize_main_df(data_path):
     main_df["build_params"] = main_df["build_params"].fillna("")
     main_df[int_cols] = main_df[int_cols].astype(int)
     main_df[float_cols] = main_df[float_cols].astype(float)
+    main_df["batch_size"] = 1 / main_df["root_access_ratio"]
     return main_df
 
 
-def group_throughput_and_fairness(main_df):
+def group_metrics(main_df):
     # get a mean and stdev of throughput and fairness columns, grouped by model, exec_params, and thread_count
     # and return joined dataframe
-    grouped = main_df.groupby(["model", "exec_params", "thread_count"])
+    common_cols = ["model", "build_params", "exec_params", "thread_count"]
+    grouped = main_df.groupby(common_cols)
     throughput_df = grouped["throughput"].agg(["mean", "std"]).reset_index()
     throughput_df = throughput_df.rename(
         columns={"mean": "throughput_mean", "std": "throughput_std"}
@@ -151,10 +153,24 @@ def group_throughput_and_fairness(main_df):
     fairness_df = fairness_df.rename(
         columns={"mean": "fairness_mean", "std": "fairness_std"}
     )
-    joined = throughput_df.merge(
-        fairness_df, on=["model", "exec_params", "thread_count"]
-    )
+    batch_size_df = grouped["batch_size"].agg(["mean"]).reset_index()
+    batch_size_df = batch_size_df.rename(columns={"mean": "batch_size_mean"})
+    joined = throughput_df.merge(fairness_df, on=common_cols)
+    joined = joined.merge(batch_size_df, on=common_cols)
     return joined
+
+
+def parse_build_params(build_params):
+    vars = build_params.split(" ")
+    agg_count = None
+    DIRECT_COUNT = None
+    for var in vars:
+        tokens = var.split("=")
+        if tokens[0] == "AGG_COUNT":
+            agg_count = int(tokens[1])
+        elif tokens[0] == "DIRECT_COUNT":
+            DIRECT_COUNT = int(tokens[1])
+    return agg_count, DIRECT_COUNT
 
 
 def draw_legends(file_path, legend_specs):
@@ -191,16 +207,22 @@ def draw_plot(
     x_col,
     y_col,
     y_err,
-    hue_col,
     legend_specs,
     title,
     x_label,
     y_label,
+    key_format="{model}",
     y_multiplier=1,
 ):
     fig, ax = plt.subplots(figsize=(10, 7))
-    for model, model_df in df.groupby(hue_col):
-        spec = legend_specs[model]
+    for (model, build_params), model_df in df.groupby(["model", "build_params"]):
+        agg_count, direct_count = parse_build_params(build_params)
+        key = key_format.format(
+            model=model, agg_count=agg_count, direct_count=direct_count
+        )
+        if "None" in key:
+            key = model
+        spec = legend_specs[key]
         marker = spec["marker"]
         color = spec["color"]
         name = spec["name"]
@@ -210,7 +232,7 @@ def draw_plot(
         line, caps, bars = plt.errorbar(
             model_df[x_col],
             model_df[y_col] * y_multiplier,
-            yerr=model_df[y_err] * y_multiplier,
+            yerr=model_df[y_err] * y_multiplier if y_err else None,
             label=name,
             marker=marker,
             zorder=zorder,
@@ -235,9 +257,67 @@ def draw_plot(
     plt.savefig(file_path, bbox_inches="tight")
 
 
+def draw_figure_3_plots(df_path, save_path):
+    df = load_and_normalize_main_df(df_path)
+    df = group_metrics(df)
+
+    legend_path = save_path + "/legends.png"
+    draw_legends(legend_path, fig3_legends)
+
+    fig3a_df = df[df["exec_params"] == "10 90 32"]
+    fig3a_path = save_path + "/fig3a.png"
+    draw_plot(
+        fig3a_path,
+        fig3a_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig3_legends,
+        "3a: 90% Fetch&Add, throughput",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}_{agg_count}",
+        y_multiplier=1e-3,
+    )
+
+    fig3b_df = fig3a_df
+    fig3b_path = save_path + "/fig3b.png"
+    draw_plot(
+        fig3b_path,
+        fig3b_df,
+        "thread_count",
+        "batch_size_mean",
+        None,
+        fig3_legends,
+        "3b: 90% Fetch&Add, batch size",
+        "Number of threads",
+        "Average batch size",
+        key_format="{model}_{agg_count}",
+    )
+
+    fig3c_df = df[df["exec_params"] == "50 50 32"]
+    fig3c_path = save_path + "/fig3c.png"
+    draw_plot(
+        fig3c_path,
+        fig3c_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig3_legends,
+        "3c: 50% Fetch&Add, throughput",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}_{agg_count}",
+        y_multiplier=1e-3,
+    )
+
+    print("Figure 3 plots are saved.")
+    return
+
+
 def draw_figure_4_plots(df_path, save_path):
     df = load_and_normalize_main_df(df_path)
-    df = group_throughput_and_fairness(df)
+    df = group_metrics(df)
 
     legend_path = save_path + "/legends.png"
     draw_legends(legend_path, fig4_legends)
@@ -249,7 +329,6 @@ def draw_figure_4_plots(df_path, save_path):
             "thread_count",
             "throughput_mean",
             "throughput_std",
-            "model",
             fig4_legends,
             title,
             "Number of threads",
@@ -260,7 +339,7 @@ def draw_figure_4_plots(df_path, save_path):
     fig4a_df = df[df["exec_params"] == "10 90 32"]
     fig4a_path = save_path + "/fig4a.png"
     draw_throughput_plot(
-        fig4a_path, fig4a_df, "4a: 90%% Fetch&Add, 512 cycles, throughput"
+        fig4a_path, fig4a_df, "4a: 90% Fetch&Add, 512 cycles, throughput"
     )
 
     fig4b_df = fig4a_df
@@ -271,9 +350,8 @@ def draw_figure_4_plots(df_path, save_path):
         "thread_count",
         "fairness_mean",
         "fairness_std",
-        "model",
         fig4_legends,
-        "4b: 90%% Fetch&Add, 512 cycles, fairness",
+        "4b: 90% Fetch&Add, 512 cycles, fairness",
         "Number of threads",
         "Fairness",
     )
@@ -281,20 +359,20 @@ def draw_figure_4_plots(df_path, save_path):
     fig4c_df = df[df["exec_params"] == "10 90 2"]
     fig4c_path = save_path + "/fig4c.png"
     draw_throughput_plot(
-        fig4c_path, fig4c_df, "4c: 90%% Fetch&Add, 32 cycles, throughput"
+        fig4c_path, fig4c_df, "4c: 90% Fetch&Add, 32 cycles, throughput"
     )
 
     fig4d_df = df[df["exec_params"] == "0 100 32"]
     fig4d_path = save_path + "/fig4d.png"
-    draw_throughput_plot(fig4d_path, fig4d_df, "4d: 100%% Fetch&Add, throughput")
+    draw_throughput_plot(fig4d_path, fig4d_df, "4d: 100% Fetch&Add, throughput")
 
     fig4e_df = df[df["exec_params"] == "50 50 32"]
     fig4e_path = save_path + "/fig4e.png"
-    draw_throughput_plot(fig4e_path, fig4e_df, "4e: 50%% Fetch&Add, throughput")
+    draw_throughput_plot(fig4e_path, fig4e_df, "4e: 50% Fetch&Add, throughput")
 
     fig4f_df = df[df["exec_params"] == "90 10 32"]
     fig4f_path = save_path + "/fig4f.png"
-    draw_throughput_plot(fig4f_path, fig4f_df, "4f: 10%% Fetch&Add, throughput")
+    draw_throughput_plot(fig4f_path, fig4f_df, "4f: 10% Fetch&Add, throughput")
 
     print("Figure 4 plots are saved.")
     return
@@ -307,6 +385,7 @@ def main():
         type=str,
         default="4",
         required=True,
+        choices=["3", "4", "5"],
         help="Figure number to draw",
     )
     parser.add_argument(
@@ -326,15 +405,15 @@ def main():
     figure_num = args.figure_num
     data_path = args.data_path
     save_path = args.save_path
+    save_path += f"/figure{figure_num}"
     os.makedirs(save_path, exist_ok=True)
 
     print(f"Drawing plots for figure {figure_num}...")
 
-    if figure_num == "4":
+    if figure_num == "3":
+        draw_figure_3_plots(data_path, save_path)
+    elif figure_num == "4":
         draw_figure_4_plots(data_path, save_path)
-    else:
-        print("Invalid figure number.")
-        return
 
 
 if __name__ == "__main__":

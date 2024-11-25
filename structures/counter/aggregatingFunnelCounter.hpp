@@ -52,6 +52,8 @@ namespace SIMPLE_AGG_FUNNEL
         void init(T start, int thread_count)
         {
             counter.store(start);
+            if (thread_count > ebr->thread_count)
+                ebr = new EpochBasedReclamation<MappingListNode>(thread_count);
         }
 
         T update(Node *child, T child_from, T child_to, int thread_id)
