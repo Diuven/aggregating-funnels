@@ -107,7 +107,7 @@ def ask_for_input():
     max_threads = int(prompt(def_max_threads, f"Max threads"))
     reps = int(prompt("5", "Repetitions"))
     ms = int(prompt("2000", "Milliseconds"))
-    preset = prompt("figure4", "Preset")
+    preset = input("Preset workload (figure3, figure4, figure5): ")
     task_path = prompt("./local/task.json", "Resulting task path")
     note = prompt(preset, "Note")
 
