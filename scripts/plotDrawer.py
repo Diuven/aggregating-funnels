@@ -1,7 +1,9 @@
+import os
 import pandas as pd
 import plotly.express as px
 import matplotlib.pyplot as plt
 from pprint import pprint
+import argparse
 
 ## default setting
 plt.rcParams["pdf.fonttype"] = 42
@@ -155,7 +157,7 @@ def group_throughput_and_fairness(main_df):
     return joined
 
 
-def draw_legends(legend_specs):
+def draw_legends(file_path, legend_specs):
     fig, ax = plt.subplots(figsize=(25, 1.8))
     for key, spec in legend_specs.items():
         ax.plot(
@@ -178,46 +180,13 @@ def draw_legends(legend_specs):
         frameon=False,
         ncol=4,
     )
-    plt.show()
-
-
-# cur_df = df[df["detail_arg"] == "90_10_32"]
-# cur_df = cur_df[cur_df["model"].isin(model_filter)]
-# cur_df = cur_df.sort_values(by=["detail_arg", "model", "n"])
-
-
-# fig, ax = plt.subplots(figsize=(10, 7))
-# for model, model_df in cur_df.groupby("model"):
-#     marker = model_info[model]["marker"]
-#     color = model_info[model]["color"]
-#     name = model_info[model]["name"]
-#     zorder = model_info[model].get("zorder", 0)
-
-#     line, caps, bars = plt.errorbar(
-#         model_df["n"],
-#         model_df["throughput"] / 1e6,
-#         yerr=model_df["throughput_stdev"] / 1e6,
-#         label=name,
-#         marker=marker,
-#         zorder=zorder,
-#         color=color,
-#         capsize=3,
-#     )
-
-#     # Set line markers
-#     plt.setp(line, marker=marker)
-#     # plt.setp(caps, marker=marker)
-
-# plt.xlabel("Number of threads")
-# plt.ylabel("Average Batch Size")
-
-# plt.xlim(left=-1)
-# plt.ylim(bottom=-0.1)
-# ax.xaxis.grid(True, linestyle="dotted")
-# ax.yaxis.grid(True, linestyle="dotted")
+    # plt.show()
+    print(f"Saving legends to {file_path}")
+    plt.savefig(file_path, bbox_inches="tight")
 
 
 def draw_plot(
+    file_path,
     df,
     x_col,
     y_col,
@@ -261,4 +230,112 @@ def draw_plot(
     ax.xaxis.grid(True, linestyle="dotted")
     ax.yaxis.grid(True, linestyle="dotted")
 
-    plt.show()
+    # plt.show()
+    print(f"Saving plot to {file_path}")
+    plt.savefig(file_path, bbox_inches="tight")
+
+
+def draw_figure_4_plots(df_path, save_path):
+    df = load_and_normalize_main_df(df_path)
+    df = group_throughput_and_fairness(df)
+
+    legend_path = save_path + "/legends.png"
+    draw_legends(legend_path, fig4_legends)
+
+    def draw_throughput_plot(path, df, title):
+        draw_plot(
+            path,
+            df,
+            "thread_count",
+            "throughput_mean",
+            "throughput_std",
+            "model",
+            fig4_legends,
+            title,
+            "Number of threads",
+            "Throughput (Mops/s)",
+            y_multiplier=1e-3,
+        )
+
+    fig4a_df = df[df["exec_params"] == "10 90 32"]
+    fig4a_path = save_path + "/fig4a.png"
+    draw_throughput_plot(
+        fig4a_path, fig4a_df, "4a: 90%% Fetch&Add, 512 cycles, throughput"
+    )
+
+    fig4b_df = fig4a_df
+    fig4b_path = save_path + "/fig4b.png"
+    draw_plot(
+        fig4b_path,
+        fig4b_df,
+        "thread_count",
+        "fairness_mean",
+        "fairness_std",
+        "model",
+        fig4_legends,
+        "4b: 90%% Fetch&Add, 512 cycles, fairness",
+        "Number of threads",
+        "Fairness",
+    )
+
+    fig4c_df = df[df["exec_params"] == "10 90 2"]
+    fig4c_path = save_path + "/fig4c.png"
+    draw_throughput_plot(
+        fig4c_path, fig4c_df, "4c: 90%% Fetch&Add, 32 cycles, throughput"
+    )
+
+    fig4d_df = df[df["exec_params"] == "0 100 32"]
+    fig4d_path = save_path + "/fig4d.png"
+    draw_throughput_plot(fig4d_path, fig4d_df, "4d: 100%% Fetch&Add, throughput")
+
+    fig4e_df = df[df["exec_params"] == "50 50 32"]
+    fig4e_path = save_path + "/fig4e.png"
+    draw_throughput_plot(fig4e_path, fig4e_df, "4e: 50%% Fetch&Add, throughput")
+
+    fig4f_df = df[df["exec_params"] == "90 10 32"]
+    fig4f_path = save_path + "/fig4f.png"
+    draw_throughput_plot(fig4f_path, fig4f_df, "4f: 10%% Fetch&Add, throughput")
+
+    print("Figure 4 plots are saved.")
+    return
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Draw plots for the benchmark results")
+    parser.add_argument(
+        "--figure_num",
+        type=str,
+        default="4",
+        required=True,
+        help="Figure number to draw",
+    )
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        required=True,
+        help="Path to the benchmark results",
+    )
+    parser.add_argument(
+        "--save_path",
+        type=str,
+        default="./results/plots",
+        help="Path to save the plots",
+    )
+
+    args = parser.parse_args()
+    figure_num = args.figure_num
+    data_path = args.data_path
+    save_path = args.save_path
+    os.makedirs(save_path, exist_ok=True)
+
+    print(f"Drawing plots for figure {figure_num}...")
+
+    if figure_num == "4":
+        draw_figure_4_plots(data_path, save_path)
+    else:
+        print("Invalid figure number.")
+        return
+
+
+if __name__ == "__main__":
+    main()

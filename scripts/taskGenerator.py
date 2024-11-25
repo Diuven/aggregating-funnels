@@ -164,7 +164,7 @@ def trials_preset_figure4():
         (100, 32),
         (50, 32),
         (10, 32),
-        (90, 4),
+        (90, 2),
     ]
 
     res_list = []
@@ -185,11 +185,11 @@ def trials_preset_figure5():
                 f"AGG_COUNT={agg_count} DIRECT_COUNT={direct_count} AUX_DATA=1"
             )
             res_list.append(
-                get_single_trial("configuredAggFunnelCounter", build_params, 90, 4)
+                get_single_trial("configuredAggFunnelCounter", build_params, 90, 2)
             )
 
     # hardwareCounter
-    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 4))
+    res_list.append(get_single_trial("hardwareCounter", "AUX_DATA=1", 90, 2))
     return res_list
 
 

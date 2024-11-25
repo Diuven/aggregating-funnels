@@ -10,7 +10,7 @@ from pprint import pprint
 def main():
     if not os.path.exists("results"):
         os.makedirs("results")
-                    
+
     # get task_path from argparse. if none given, use default
     # task
     parser = argparse.ArgumentParser(description="Run benchmark")
@@ -44,7 +44,7 @@ def main():
             "trial_example": trials[0],
         },
     )
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
 
     # make save_path
     os.makedirs(save_path, exist_ok=True)
@@ -58,6 +58,7 @@ def main():
     ms = int(task_info["exec_format"].split(" ")[-4])
     total_min = total_exec * ms / 1000 / 60
     print(f"Estimated total execution time: {total_min} minutes for {total_exec} runs")
+    os.system(f"cp {task_path} {save_path}/task.json")
 
     for trial in trials:
         model_type = trial["model_type"]

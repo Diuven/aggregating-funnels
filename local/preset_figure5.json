@@ -10,37 +10,37 @@
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=2 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=2 DIRECT_COUNT=1 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=2 DIRECT_COUNT=2 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=6 DIRECT_COUNT=0 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=6 DIRECT_COUNT=1 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "configuredAggFunnelCounter",
       "build_params": "AGG_COUNT=6 DIRECT_COUNT=2 AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     },
     {
       "model_type": "hardwareCounter",
       "build_params": "AUX_DATA=1",
-      "exec_params": "10 90 4"
+      "exec_params": "10 90 2"
     }
   ]
 }
