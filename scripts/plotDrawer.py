@@ -111,7 +111,7 @@ fig5_legends = {
 }
 
 
-def load_and_normalize_main_df(data_path):
+def load_and_prepare_main_df(data_path):
     main_path = data_path + "/main.csv"
     str_cols = [
         "model",
@@ -140,6 +140,52 @@ def load_and_normalize_main_df(data_path):
     return main_df
 
 
+def load_and_prepare_aux_df(data_path):
+    main_path = data_path + "/aux.csv"
+    str_cols = [
+        "model",
+        "build_params",
+        "exec_params",
+    ]
+    int_cols = [
+        "thread_id",
+        "threads",
+        "rep",
+        "read_count",
+        "inc_count",
+        "total_count",
+    ]
+
+    aux_df = pd.read_csv(main_path, usecols=str_cols + int_cols)
+    aux_df["build_params"] = aux_df["build_params"].fillna("")
+    aux_df[int_cols] = aux_df[int_cols].astype(int)
+    aux_df = aux_df.rename(columns={"threads": "thread_count"})
+    return aux_df
+
+
+def join_hi_lo_ratio(main_df, aux_df):
+    common_cols = ["model", "build_params", "exec_params", "thread_count", "rep"]
+    for vals, cur_df in aux_df.groupby(common_cols):
+        _, build_params, _, _, _ = vals
+        agg_count, direct_count = parse_build_params(build_params)
+        if direct_count == 0 or direct_count is None:
+            hi_lo_ratio = 0
+        elif direct_count == 1:
+            hi_lo_ratio = cur_df[cur_df["thread_id"] == 0]["total_count"].mean() / (
+                cur_df[cur_df["thread_id"] != 0]["total_count"].mean()
+            )
+        elif direct_count == 2:
+            hi_lo_ratio = cur_df[cur_df["thread_id"] <= 1]["total_count"].mean() / (
+                cur_df[cur_df["thread_id"] > 1]["total_count"].mean()
+            )
+        if hi_lo_ratio != hi_lo_ratio:
+            hi_lo_ratio = 0
+        aux_df.loc[cur_df.index, "hi_lo_ratio"] = hi_lo_ratio
+
+    joined = main_df.merge(aux_df, on=common_cols)
+    return joined
+
+
 def group_metrics(main_df):
     # get a mean and stdev of throughput and fairness columns, grouped by model, exec_params, and thread_count
     # and return joined dataframe
@@ -155,8 +201,14 @@ def group_metrics(main_df):
     )
     batch_size_df = grouped["batch_size"].agg(["mean"]).reset_index()
     batch_size_df = batch_size_df.rename(columns={"mean": "batch_size_mean"})
+    # if hi_lo_ratio is not calculated, set it to 0
+    if "hi_lo_ratio" not in main_df.columns:
+        main_df["hi_lo_ratio"] = 0
+    ratio_df = grouped["hi_lo_ratio"].agg(["mean"]).reset_index()
+    ratio_df = ratio_df.rename(columns={"mean": "hi_lo_ratio_mean"})
     joined = throughput_df.merge(fairness_df, on=common_cols)
     joined = joined.merge(batch_size_df, on=common_cols)
+    joined = joined.merge(ratio_df, on=common_cols)
     return joined
 
 
@@ -258,7 +310,7 @@ def draw_plot(
 
 
 def draw_figure_3_plots(df_path, save_path):
-    df = load_and_normalize_main_df(df_path)
+    df = load_and_prepare_main_df(df_path)
     df = group_metrics(df)
 
     legend_path = save_path + "/legends.png"
@@ -316,7 +368,7 @@ def draw_figure_3_plots(df_path, save_path):
 
 
 def draw_figure_4_plots(df_path, save_path):
-    df = load_and_normalize_main_df(df_path)
+    df = load_and_prepare_main_df(df_path)
     df = group_metrics(df)
 
     legend_path = save_path + "/legends.png"
@@ -378,6 +430,68 @@ def draw_figure_4_plots(df_path, save_path):
     return
 
 
+def draw_figure_5_plots(df_path, save_path):
+    main_df = load_and_prepare_main_df(df_path)
+    aux_df = load_and_prepare_aux_df(df_path)
+    joined_df = join_hi_lo_ratio(main_df, aux_df)
+    grouped_df = group_metrics(joined_df)
+
+    legend_path = save_path + "/legends.png"
+    draw_legends(legend_path, fig5_legends)
+
+    fig5a_df = grouped_df[grouped_df["exec_params"] == "10 90 2"]
+    fig5a_path = save_path + "/fig5a.png"
+    draw_plot(
+        fig5a_path,
+        fig5a_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig5_legends,
+        "5a: throughput",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}_{agg_count}_{direct_count}",
+        y_multiplier=1e-3,
+    )
+
+    fig5b_df = fig5a_df[
+        (fig5a_df["model"] == "hardwareCounter")
+        | ~fig5a_df["build_params"].str.contains("DIRECT_COUNT=0")
+    ]
+    fig5b_path = save_path + "/fig5b.png"
+    draw_plot(
+        fig5b_path,
+        fig5b_df,
+        "thread_count",
+        "hi_lo_ratio_mean",
+        None,
+        fig5_legends,
+        "5b: Average throughput ratio",
+        "Number of threads",
+        "High / Low Ratio",
+        key_format="{model}_{agg_count}_{direct_count}",
+    )
+
+    fig5c_df = fig5a_df
+    fig5c_path = save_path + "/fig5c.png"
+    draw_plot(
+        fig5c_path,
+        fig5c_df,
+        "thread_count",
+        "batch_size_mean",
+        None,
+        fig5_legends,
+        "5c: batch size",
+        "Number of threads",
+        "Average batch size",
+        key_format="{model}_{agg_count}_{direct_count}",
+    )
+
+    print("Figure 5 plots are saved.")
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(description="Draw plots for the benchmark results")
     parser.add_argument(
@@ -414,6 +528,8 @@ def main():
         draw_figure_3_plots(data_path, save_path)
     elif figure_num == "4":
         draw_figure_4_plots(data_path, save_path)
+    elif figure_num == "5":
+        draw_figure_5_plots(data_path, save_path)
 
 
 if __name__ == "__main__":
