@@ -28,14 +28,15 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
    - Note: This command mounts the current directory `aggregating-funnels/` into the docker container, so both are synchronized.
 
 4. Testing
-   - Inside the docker container, Run `python3 scripts/benchmarkRunner.py --task_path local/example.json` to run the benchmark, and run `python3 scripts/plotDrawer.py --figure_num ex --data_path results/counter/example__test --save_path results/plots/example` to generate the example plot.
-   - This should take a few minutes and produce an output graph in `results/plots/example`
+   - Inside the docker container, Run `python3 scripts/benchmarkRunner.py --task_path local/example.json` to run a simple benchmark, and run `python3 scripts/plotDrawer.py --figure_num ex --data_path results/counter/example__test --save_path results/plots/example` to generate the example plot.
+   - This should take a few minutes and produce output graphs in `results/plots/example`
+   - To check if this simple experiment ran correctly, compare the output graphs with the ones in `results/plots/example_expected_output`
 
 ## Reproducing Paper Results
 
 5. Run the benchmark.
 
-   - Setting thread count: Truncate the `thread_list` parameter in `./local/preset_figure3.json`, `./local/preset_figure4.json`, `./local/preset_figure5.json` based on the number of logical cores on your machine.
+   - Set thread count: Truncate the `thread_list` parameter in `./local/preset_figure3.json`, `./local/preset_figure4.json`, `./local/preset_figure5.json` based on the number of logical cores on your machine.
    - Running `./scripts/run_counter_bench.sh` and `./scripts/run_queue_bench.sh` will build and run all the experiments, and generate the figures in the `results/plots` directory. This will take a couple of hours to run, depending on the number of threads available. stdout will show estimated time to completion for each figure.
    - During the benchmark, you can monitor the progress by checking stdout and the contents of the `results/` directory. `log.txt` will have the output logs, and `main.csv` will have the raw data for each run.
 
@@ -45,14 +46,10 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
   - `taskGenerator` generates the json file and saves to `local` directory. You can directly inspect and edit the json file (recommended), or run `python3 scripts/taskGenerator.py` to walk through the prompts and generate a custom task spec.
   - `benchmarkRunner` runs the tasks specified in the given json file. You can change the json file with `--task_path` option. It saves the results in the `results` directory, in a subdirectory specified by the json file's `save_path` field.
   - `plotDrawer` generates the plots from the results. It currently supports generating the plots for the figures in the paper. You can change `--data_path`, `--save_path`, and `--figure_num` options.
-- Queue benchmark is more complicated to customize, since it uses different pipeline and does not have json file. Refer to the `scripts/run_queue_bench.sh` script to see how the benchmark is run, and edit it to modify the parameters. For reference
-
-## List of claims from the paper supported by the artifact
-
-- Given a machine with > 80 logical cores with numactl, the graphs generated should be similar to the ones reported in our paper (up to the corresponding core count)
+- Queue benchmark is more complicated to customize, since it uses different pipeline and does not have json file. Refer to the `scripts/run_queue_bench.sh` script to see how the benchmark is run, and edit it to modify the parameters.
 
 ## Notes
 
-- Queue benchmark is often flaky, and it may not have LSCQ results.
+- For the queue benchmark, we omitted LSCQ because it sometimes crashes. LSCQ has been shown in previous work to be slower than both LCRQ and LPRQ. Both LCRQ and LPRQ are included in the artifact submission.
 - Since the queue experiments are more complicated to script, it only generates one plot for 6a. 6b and 6c are expected to have similar trends.
 - We used a machine with Intel Xeon Platinum 8481C CPU (Sapphire Rapids) with 4 sockets for our experiments. Different machines may have different performance characteristics.
