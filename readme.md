@@ -13,7 +13,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 ## Getting Started Guide
 
-1. Clone the repository, or download the artifact from the [artifact archive](https://doi.org/10.5281/zenodo.5555555)
+1. Clone the repository, or download the artifact from the artifact archive.
 
    - `git clone https://github.com/Diuven/aggregating-funnels.git && cd aggregating-funnels`
 
