@@ -34,12 +34,12 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 5. Run the benchmark.
 
-   - Running `./scripts/run_figures.sh` will run all the experiments and generate the figures in the `results/plots` directory. This will take a couple of hours to run, depending on the number of threads available. stdout will show estimated time to completion for each figure.
+   - Running `./scripts/run_counter_bench.sh` will run all the experiments and generate the figures in the `results/plots` directory. This will take a couple of hours to run, depending on the number of threads available. stdout will show estimated time to completion for each figure.
    - During the benchmark, you can monitor the progress by checking stdout and the contents of the `results/` directory. `log.txt` will have the output logs, and `main.csv` will have the raw data for each run.
 
 ## Customizing the Benchmark
 
-- The default workflow, as specified in `scripts/run_figures.sh`, is to run `taskGenerator` to generate task specs, run `benchmarkRunner` to run the tasks with the specified parameters, and finally run `plotDrawer` to generate the plots from the results.
+- The default workflow, as specified in `scripts/run_counter_bench.sh`, is to run `taskGenerator` to generate task specs, run `benchmarkRunner` to run the tasks with the specified parameters, and finally run `plotDrawer` to generate the plots from the results.
   - `taskGenerator` generates the json file and saves to `local` directory. You can directly inspect and edit the json file (recommended), or run `python3 scripts/taskGenerator.py` to walk through the prompts and generate a custom task spec.
   - `benchmarkRunner` runs the tasks specified in the given json file. You can change the json file with `--task_path` option. It saves the results in the `results` directory, in a subdirectory specified by the json file's `save_path` field.
   - `plotDrawer` generates the plots from the results. It currently supports generating the plots for the figures in the paper. You can change `--data_path`, `--save_path`, and `--figure_num` options.

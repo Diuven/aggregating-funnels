@@ -24,15 +24,17 @@ def default_agg_spec(name):
     }
 
 
-default_hw_spec = {
-    "marker": "^",
-    "color": "tab:orange",
-    "name": "HardwareF&A",
-    "zorder": 10,
-}
+def default_hw_spec(name="HardwareF&A"):
+    return {
+        "marker": "^",
+        "color": "tab:orange",
+        "name": name,
+        "zorder": 10,
+    }
+
 
 fig3_legends = {
-    "hardwareCounter": default_hw_spec,
+    "hardwareCounter": default_hw_spec(),
     "confRootAggFunnelCounter": {
         "marker": "d",
         "color": "tab:green",
@@ -59,7 +61,7 @@ fig3_legends = {
 }
 
 fig4_legends = {
-    "hardwareCounter": default_hw_spec,
+    "hardwareCounter": default_hw_spec(),
     "aggFunnelCounter": default_agg_spec("AggFunnel"),
     "combFunnelCounter": {
         "marker": "x",
@@ -76,7 +78,7 @@ fig4_legends = {
 }
 
 fig5_legends = {
-    "hardwareCounter": default_hw_spec,
+    "hardwareCounter": default_hw_spec(),
     "configuredAggFunnelCounter_6_0": default_agg_spec("AggFunnel-(6,0)"),
     "configuredAggFunnelCounter_6_1": {
         "marker": ">",
@@ -107,6 +109,29 @@ fig5_legends = {
         "color": "tab:purple",
         "name": "AggFunnel-(2,2)",
         "zorder": 35,
+    },
+}
+
+fig6_legends = {
+    "LCRQueue/remap/SimpleAtomicCounter": default_hw_spec("LCRQ-HardwareF&A"),
+    "LCRQueue/remap/StumpCounter/fanout6/direct0": default_agg_spec("LCRQ-AggFunnel"),
+    "LPRQueue/remap/SimpleAtomicCounter": {
+        "marker": "d",
+        "color": "tab:cyan",
+        "name": "LPRQ-HardwareF&A",
+        "zorder": 5,
+    },
+    "LCRQueue/remap/CombiningFunnelCounter": {
+        "marker": "x",
+        "color": "tab:purple",
+        "name": "LCRQ-CombFunnel",
+        "zorder": 15,
+    },
+    "LSCQueue/remap/SimpleAtomicCounter": {
+        "marker": "s",
+        "color": "tab:red",
+        "name": "LSCQ-HardwareF&A",
+        "zorder": 5,
     },
 }
 
@@ -492,6 +517,53 @@ def draw_figure_5_plots(df_path, save_path):
     return
 
 
+def load_queue_df(data_path):
+    main_path = data_path + "/main.csv"
+    str_cols_map = {
+        "Benchmark": "task",
+        "Param: queueType": "model",
+    }
+    int_cols_map = {
+        "Threads": "thread_count",
+        "Param: additionalWork": "additional_work",
+        "Param: ringSize": "ring_size",
+        "Score": "throughput_mean",
+        "Score Error": "throughput_std",
+    }
+    cols = list(str_cols_map.keys()) + list(int_cols_map.keys())
+    main_df = pd.read_csv(main_path, usecols=cols)
+    main_df[list(int_cols_map.keys())] = main_df[list(int_cols_map.keys())].astype(int)
+    main_df = main_df.rename(columns=str_cols_map)
+    main_df = main_df.rename(columns=int_cols_map)
+    main_df["build_params"] = ""
+    return main_df
+
+
+def draw_figure_6_plots(df_path, save_path):
+    df = load_queue_df(df_path)
+    legend_path = save_path + "/legends.png"
+    draw_legends(legend_path, fig6_legends)
+
+    fig6a_df = df
+    fig6a_path = save_path + "/fig6a.png"
+    draw_plot(
+        fig6a_path,
+        fig6a_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig6_legends,
+        "6a: Pairwise enq-deq",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}",
+        y_multiplier=1e-6,
+    )
+
+    print("Figure 6 plots are saved.")
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(description="Draw plots for the benchmark results")
     parser.add_argument(
@@ -499,7 +571,7 @@ def main():
         type=str,
         default="4",
         required=True,
-        choices=["3", "4", "5"],
+        choices=["3", "4", "5", "6"],
         help="Figure number to draw",
     )
     parser.add_argument(
@@ -530,6 +602,8 @@ def main():
         draw_figure_4_plots(data_path, save_path)
     elif figure_num == "5":
         draw_figure_5_plots(data_path, save_path)
+    elif figure_num == "6":
+        draw_figure_6_plots(data_path, save_path)
 
 
 if __name__ == "__main__":
