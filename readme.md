@@ -8,16 +8,17 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 ## Hardware/Software Requirements
 
-- An Intel machine with 40+ cores (80+ hyperthreads) with Docker ([install docker](https://docs.docker.com/engine/install/))
+- An Intel machine with 40+ cores (80+ hyperthreads) with Docker
 - The full set of experiments takes ~10 hours to run
 
 ## Getting Started Guide
 
 1. Clone the repository, or download the artifact from the artifact archive.
 
-   - `git clone https://github.com/Diuven/aggregating-funnels.git && cd aggregating-funnels`
+   - The artifact is archived and is availalbe in [Github release](https://github.com/Diuven/aggregating-funnels/releases/tag/artifact-archive)
+   - If you don't have the artifact, run `git clone https://github.com/Diuven/aggregating-funnels.git && cd aggregating-funnels && git checkout -b artifact-submission origin/artifact-submission`
 
-2. Build the docker image 
+2. Build the docker image ([install docker](https://docs.docker.com/engine/install/) if you haven't)
 
    - `docker build --network=host --platform linux/amd64 -t aggfunnel .`
 
@@ -48,7 +49,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 ## List of claims from the paper supported by the artifact
 
-- Given a machine with > 80 logical cores, the graphs generated should be similar to the ones reported in our paper (up to the corresponding core count)
+- Given a machine with > 80 logical cores with numactl, the graphs generated should be similar to the ones reported in our paper (up to the corresponding core count)
 
 ## Notes
 
