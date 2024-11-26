@@ -285,7 +285,7 @@ namespace bench
             const char *init_size_str = std::getenv("INIT_SIZE");
             int init_size = init_size_str ? std::stoi(init_size_str) : 1;
 
-            auto enqdeq_lambda = [this, &startFlag, &numPairs, &queue, &conseq_ops](const int tid)
+            auto enqdeq_lambda = [this, &startFlag, &numPairs, &queue, &conseq_ops, &init_size](const int tid)
             {
                 // printf("thread tid = %03d spawned\n", tid);
                 UserData ud(0, 0);
