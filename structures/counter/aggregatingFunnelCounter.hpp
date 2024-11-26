@@ -11,7 +11,7 @@
 #include "./common.hpp"
 #endif
 
-#define AGG_COUNT 6
+#define FIXED_AGG_COUNT 6
 
 namespace SIMPLE_AGG_FUNNEL
 {
@@ -36,7 +36,7 @@ namespace SIMPLE_AGG_FUNNEL
         };
 
         alignas(1024) std::atomic<T> counter = 0;
-        Node child[AGG_COUNT];
+        Node child[FIXED_AGG_COUNT];
         int PADDING[32] = {};
 
     public:
@@ -89,7 +89,7 @@ namespace SIMPLE_AGG_FUNNEL
 
         T fetch_add(T diff, int thread_id)
         {
-            int nd_idx = thread_id % AGG_COUNT;
+            int nd_idx = thread_id % FIXED_AGG_COUNT;
             if (nd_idx < 0)
             {
                 return counter.fetch_add(diff);

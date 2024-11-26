@@ -59,6 +59,8 @@ def main():
     total_min = total_exec * ms / 1000 / 60
     print(f"Estimated total execution time: {total_min} minutes for {total_exec} runs")
     os.system(f"cp {task_path} {save_path}/task.json")
+    log_path = os.path.join(save_path, "log.txt")
+    open(log_path, "w").close()
 
     for trial in trials:
         model_type = trial["model_type"]
@@ -78,7 +80,10 @@ def main():
                     exec_params=exec_params,
                 )
                 print(f"Running {model_type} with {th} threads, rep {i+1}")
-                subprocess.run(exec_command, shell=True, check=True)
+                # redirect output to log.txt
+                subprocess.run(
+                    exec_command, shell=True, check=True, stdout=open(log_path, "a")
+                )
                 # read data and concat
                 cur_main_df = pd.read_csv("results/counter_main.csv")
                 cur_main_df["model"] = model_type

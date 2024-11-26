@@ -1,9 +1,10 @@
 import json
 import os
+import argparse
 
 
 def generate_save_path(note):
-    res = "./results/counter/{datetime_str}__"
+    res = "./results/counter/task__"
     res += f"{note}/"
     return res
 
@@ -193,10 +194,62 @@ def trials_preset_figure5():
     return res_list
 
 
+def check_and_parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--default", action="store_true")
+    parser.add_argument("--figure_num", type=str, choices=["3", "4", "5"])
+    args = parser.parse_args()
+
+    def_max_threads = os.cpu_count()
+    def_use_numa = os.system("numactl --show > /dev/null 2>&1") == 0
+    use_numa, malloc_path, exec_path, max_threads, reps, ms = (
+        def_use_numa,
+        "/usr/local/lib/libmimalloc.so",
+        "./build/counter_benchmark",
+        def_max_threads,
+        5,
+        2000,
+    )
+
+    if args.default and args.figure_num is not None:
+        if args.figure_num == "3":
+            preset = "figure3"
+            task_path = "./local/task_figure3.json"
+            note = "figure3"
+        elif args.figure_num == "4":
+            preset = "figure4"
+            task_path = "./local/task_figure4.json"
+            note = "figure4"
+        elif args.figure_num == "5":
+            preset = "figure5"
+            task_path = "./local/task_figure5.json"
+            note = "figure5"
+        res = (
+            use_numa,
+            malloc_path,
+            exec_path,
+            max_threads,
+            reps,
+            ms,
+            preset,
+            task_path,
+            note,
+        )
+    else:
+        res = ask_for_input()
+
+    return res
+
+
 def main():
     use_numa, malloc_path, exec_path, max_threads, reps, ms, preset, task_path, note = (
-        ask_for_input()
+        check_and_parse_args()
     )
+
+    if not use_numa:
+        print("Warning: NUMA is not used")
+    if not malloc_path:
+        print("Warning: Faster malloc is not used")
 
     task_info = {}
     task_info["save_path"] = generate_save_path(note)
@@ -219,7 +272,7 @@ def main():
 
     total_exec = reps * len(task_info["threads_list"]) * len(task_info["trials"])
     total_min = total_exec * ms / 1000 / 60
-    print(json.dumps(task_info, indent=2))
+    # print(json.dumps(task_info, indent=2))
     print(f"Estimated total execution time: {total_min} minutes")
     print(f"Writing to {task_path}")
 
