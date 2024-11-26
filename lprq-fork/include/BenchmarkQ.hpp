@@ -377,6 +377,12 @@ namespace bench
                 printMetrics(metrics);
                 cout << endl;
             }
+            const char *conseq_ops_str = std::getenv("CONSEQ_OPS");
+            const char *init_size_str = std::getenv("INIT_SIZE");
+
+            char benchtype[100];
+            sprintf(benchtype, "enqDeqPairs_%s-%s", conseq_ops_str ? conseq_ops_str : "1", init_size_str ? init_size_str : "0");
+            // swap "enqdqPairs" with benchtype
 
             writeThroughputCsvData(csvFile, "enqDeqPairs", Q::className(),
                                    numThreads, additionalWork, Q::RING_SIZE, sts);

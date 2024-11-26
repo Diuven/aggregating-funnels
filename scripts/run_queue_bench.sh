@@ -43,6 +43,8 @@ echo "Running with threads: $THREADS, 5 iterations each for 5 configurations"
 
 AGGFUNNEL_ARGS="COUNTER_TYPE=1 STUMP_CONFIG_TYPE=fixed STUMP_FANOUT_COUNT=6 STUMP_DIRECT_COUNT=0"
 
+
+# 6a bench
 # aggfunnel lcrq
 eval $AGGFUNNEL_ARGS $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
 # hw lprq, lcrq, lscq
@@ -51,6 +53,28 @@ eval COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LPRQueue
 eval COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LSCQueue/remap.+" $ARGS 2> /dev/null
 # combfunnel lcrq
 eval COUNTER_TYPE=3 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+
+# # 6b bench
+# # aggfunnel lcrq
+# eval CONSEQ_OPS=4 $AGGFUNNEL_ARGS $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+# # hw lprq, lcrq, lscq
+# eval CONSEQ_OPS=4 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+# eval CONSEQ_OPS=4 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LPRQueue/remap.+" $ARGS 2> /dev/null
+# eval CONSEQ_OPS=4 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LSCQueue/remap.+" $ARGS 2> /dev/null
+# # combfunnel lcrq
+# eval CONSEQ_OPS=4 COUNTER_TYPE=3 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+
+# # 6c bench
+# # aggfunnel lcrq
+# eval INIT_SIZE=500 $AGGFUNNEL_ARGS $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+# # hw lprq, lcrq, lscq
+# eval INIT_SIZE=500 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+# eval INIT_SIZE=500 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LPRQueue/remap.+" $ARGS 2> /dev/null
+# eval INIT_SIZE=500 COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LSCQueue/remap.+" $ARGS 2> /dev/null
+# # combfunnel lcrq
+# eval INIT_SIZE=500 COUNTER_TYPE=3 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
+
+
 
 echo "Queue benchmark finished at `date`"
 

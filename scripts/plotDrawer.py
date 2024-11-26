@@ -535,7 +535,9 @@ def load_queue_df(data_path):
     main_df[list(int_cols_map.keys())] = main_df[list(int_cols_map.keys())].astype(int)
     main_df = main_df.rename(columns=str_cols_map)
     main_df = main_df.rename(columns=int_cols_map)
-    main_df["build_params"] = ""
+    # split Benchmark into exec_params
+    main_df["exec_params"] = main_df["task"].str.split("_").str[-1]
+
     return main_df
 
 
