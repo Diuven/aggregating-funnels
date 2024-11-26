@@ -16,6 +16,8 @@ if(USE_LIBCPP)
     add_link_options(-stdlib=libc++ -lc++abi)
 endif()
 
+add_compile_options(-w)
+
 find_package(Threads REQUIRED)
 include(Gtest.cmake)
 include(CLI11.cmake)

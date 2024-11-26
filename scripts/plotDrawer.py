@@ -114,7 +114,7 @@ fig5_legends = {
 
 fig6_legends = {
     "LCRQueue/remap/SimpleAtomicCounter": default_hw_spec("LCRQ-HardwareF&A"),
-    "LCRQueue/remap/StumpCounter/fanout6/direct0": default_agg_spec("LCRQ-AggFunnel"),
+    "LCRQueue/remap/AggFunnelCounter": default_agg_spec("LCRQ-AggFunnel"),
     "LPRQueue/remap/SimpleAtomicCounter": {
         "marker": "d",
         "color": "tab:cyan",

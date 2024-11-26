@@ -432,7 +432,7 @@ namespace bench
                                             if (counter_type == 0)
                                                 Queues<UserData, SIMPLE_ATOMIC_COUNTER::SimpleAtomicCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             else if (counter_type == 1)
-                                                Queues<UserData, STUMP_COUNTER::StumpCounter<uint64_t>, ring_size>::foreach (bench_func);
+                                                Queues<UserData, SIMPLE_AGG_FUNNEL::AggFunnelCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             // else if (counter_type == 2)
                                             //     Queues<UserData, NESTED_STUMP_COUNTER::NestedStumpCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             else if (counter_type == 3)
@@ -719,7 +719,7 @@ namespace bench
                                             if (counter_type == 0)
                                                 Queues<UserData, SIMPLE_ATOMIC_COUNTER::SimpleAtomicCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             else if (counter_type == 1)
-                                                Queues<UserData, STUMP_COUNTER::StumpCounter<uint64_t>, ring_size>::foreach (bench_func);
+                                                Queues<UserData, SIMPLE_AGG_FUNNEL::AggFunnelCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             // else if (counter_type == 2)
                                             //     Queues<UserData, NESTED_STUMP_COUNTER::NestedStumpCounter<uint64_t>, ring_size>::foreach (bench_func);
                                             else if (counter_type == 3)

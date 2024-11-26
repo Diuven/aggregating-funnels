@@ -7,10 +7,13 @@
 #include <cstdlib>
 #include "EpochBasedReclamation.hpp"
 
-namespace STUMP_COUNTER
+#define FIXED_AGG_COUNT 6
+static const int max_thread_count = std::thread::hardware_concurrency();
+
+namespace SIMPLE_AGG_FUNNEL
 {
     template <typename T>
-    class alignas(1024) StumpCounter
+    class alignas(1024) AggFunnelCounter
     {
     private:
         struct alignas(32) MappingListNode
@@ -21,7 +24,7 @@ namespace STUMP_COUNTER
             T root_from = -1;
         };
 
-        struct alignas(1024) Node
+        struct alignas(256) Node
         {
             alignas(128) std::atomic<T> count = 0;
             alignas(128) std::atomic<T> sent = 0;
@@ -30,85 +33,30 @@ namespace STUMP_COUNTER
         };
 
         alignas(1024) std::atomic<T> counter = 0;
-        int PADDING_1[32] = {};
-
-        Node child[64]; // Max thread count is 64*64=4096
-        int PADDING_2[32] = {};
-
-        int thread_count;
-        std::vector<int> starting_node;
-        std::string config_type;
-        int direct_count;
-        int fanout_count;
-        int PADDING_3[32] = {};
-
-        EpochBasedReclamation<MappingListNode> *ebr = nullptr;
-        int PADDING_4[32] = {};
-
-        int configure_fixed_fanout(int fanout, int direct = 0)
-        {
-            int root_fanout = fanout;
-            for (int i = direct; i < thread_count; i++)
-            {
-                starting_node[i] = i % fanout + 1;
-            }
-
-            for (int i = 0; i < direct; i++)
-            {
-                root_fanout++;
-                starting_node[i] = -root_fanout;
-            }
-            return root_fanout;
-        }
-
-        int configure_root_fanout(int direct = 0)
-        {
-            int block = 1; // ceil(sqrt(thread_count))
-            while ((block) * (block) < (thread_count))
-                block++;
-            return configure_fixed_fanout(block, direct);
-        }
+        Node child[FIXED_AGG_COUNT];
+        int PADDING[32] = {};
 
     public:
-        static std::tuple<bool, int, int> get_config()
-        {
-            const char *config_type_str = std::getenv("STUMP_CONFIG_TYPE");
-            bool use_sqrt = config_type_str != nullptr && std::string(config_type_str) == "sqrt";
-            const char *fanout_count_str = std::getenv("STUMP_FANOUT_COUNT");
-            int fanout = fanout_count_str != nullptr ? std::stoi(fanout_count_str) : 6;
-            const char *direct_count_str = std::getenv("STUMP_DIRECT_COUNT");
-            int direct = direct_count_str != nullptr ? std::stoi(direct_count_str) : 0;
-
-            return std::make_tuple(use_sqrt, fanout, direct);
-        }
+        inline static EpochBasedReclamation<MappingListNode> *ebr = new EpochBasedReclamation<MappingListNode>(max_thread_count);
         static std::string className()
         {
-            using namespace std::string_literals;
-            auto [use_sqrt, fanout, direct] = get_config();
-            if (use_sqrt)
-                return "StumpCounter/sqrt"s + "/direct"s + std::to_string(direct);
-            else
-                return "StumpCounter/fanout"s + std::to_string(fanout) + "/direct"s + std::to_string(direct);
+            return "AggFunnelCounter";
         }
-        StumpCounter() {}
-        ~StumpCounter() { delete ebr; }
-        StumpCounter(int thread_count) : StumpCounter(0, thread_count) {}
-        StumpCounter(T start, int thread_count, int contention_cutoff = 14)
-        {
-            init(start, thread_count, contention_cutoff);
-        }
-        void init(T start, int thread_count, int contention_cutoff = 14)
-        {
-            this->thread_count = thread_count;
-            ebr = new EpochBasedReclamation<MappingListNode>(thread_count);
-            counter.store(start);
-            starting_node.resize(thread_count, 0);
 
-            auto [use_sqrt, fanout, direct] = get_config();
-            if (use_sqrt)
-                configure_root_fanout(direct);
-            else
-                configure_fixed_fanout(fanout, direct);
+        AggFunnelCounter()
+        {
+        }
+        ~AggFunnelCounter() {}
+        AggFunnelCounter(int thread_count) : AggFunnelCounter(0, thread_count) {}
+        AggFunnelCounter(T start, int thread_count)
+        {
+            init(start, thread_count);
+        }
+        void init(T start, int thread_count)
+        {
+            counter.store(start);
+            if (thread_count > ebr->thread_count)
+                ebr = new EpochBasedReclamation<MappingListNode>(thread_count);
         }
 
         T update(Node *child, T child_from, T child_to, int thread_id)
@@ -144,7 +92,7 @@ namespace STUMP_COUNTER
 
         T fetch_add(T diff, int thread_id)
         {
-            int nd_idx = starting_node[thread_id];
+            int nd_idx = thread_id % FIXED_AGG_COUNT;
             if (nd_idx < 0)
             {
                 return counter.fetch_add(diff);

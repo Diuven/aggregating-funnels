@@ -6,11 +6,11 @@ cmake -DCMAKE_BUILD_TYPE=Release -DUSE_LIBCPP=ON -DDISABLE_HP=ON ..
 make -j8
 cd ../..
 
-mkdir -p results/queue/task_figure6
+mkdir -p results/queue/task__figure6
 
 
 BENCH="lprq-fork/build/bench-enq-deq"
-RESULT="results/queue/task_figure6/main.csv"
+RESULT="results/queue/task__figure6/main.csv"
 ARGS="-w 32 -r 1024 -i 5"
 
 if [[ -f $RESULT ]]; then
@@ -38,11 +38,10 @@ if ! command -v numactl -i all ls &> /dev/null; then
   NUMA_ARGS=""
 fi
 
+echo "Starting queue benchmark at `date`"
 echo "Running with threads: $THREADS, 5 iterations each for 5 configurations"
 
 AGGFUNNEL_ARGS="COUNTER_TYPE=1 STUMP_CONFIG_TYPE=fixed STUMP_FANOUT_COUNT=6 STUMP_DIRECT_COUNT=0"
-
-echo COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LPRQueue/remap.+" $ARGS 2> /dev/null
 
 # aggfunnel lcrq
 eval $AGGFUNNEL_ARGS $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
@@ -53,7 +52,7 @@ eval COUNTER_TYPE=0 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LSCQueue
 # combfunnel lcrq
 eval COUNTER_TYPE=3 $NUMA_ARGS $BENCH --fork -f $RESULT -t $THREADS -q "LCRQueue/remap.+" $ARGS 2> /dev/null
 
-
+echo "Queue benchmark finished at `date`"
 
 
 # draw plot
