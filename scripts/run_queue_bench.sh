@@ -2,7 +2,7 @@
 
 mkdir -p lprq-fork/build
 cd lprq-fork/build
-cmake -DCMAKE_BUILD_TYPE=Release -DUSE_LIBCPP=ON -DDISABLE_HP=ON ..
+CC=clang-13 CXX=clang++-13 cmake -DCMAKE_BUILD_TYPE=Release -DUSE_LIBCPP=ON -DDISABLE_HP=ON ..
 make -j8
 cd ../..
 

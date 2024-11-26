@@ -1,5 +1,5 @@
 {
-  "save_path": "counter/{datetime_str}__test/",
+  "save_path": "results/counter/example__test/",
   "build_format": "make {model_type} {build_params}",
   "exec_format": "./build/counter_benchmark {threads} 1000 {exec_params} 2> /dev/null",
   "repetition": 1,
