@@ -28,8 +28,8 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
    - Note: This command mounts the current directory `aggregating-funnels/` into the docker container, so both are synchronized.
 
 4. Testing
-   - Run `python3 scripts/benchmarkRunner.py --task_path local/example.json` inside the docker container
-   - This should take a few minutes and produce an output graph in `results/counter/`
+   - Inside the docker container, Run `python3 scripts/benchmarkRunner.py --task_path local/example.json` to run the benchmark, and run `python3 scripts/plotDrawer.py --figure_num ex --data_path results/counter/example__test --save_path results/plots/example` to generate the example plot.
+   - This should take a few minutes and produce an output graph in `results/plots/example`
 
 ## Reproducing Paper Results
 

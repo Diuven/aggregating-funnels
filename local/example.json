@@ -8,42 +8,42 @@
     {
       "model_type": "hardwareCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "hardwareCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "90 10 32"
     },
     {
       "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "aggFunnelCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "90 10 32"
     },
     {
       "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "recursiveAggFunnelCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "90 10 32"
     },
     {
       "model_type": "combFunnelCounter",
       "build_params": "",
-      "exec_params": "10 90 512"
+      "exec_params": "10 90 32"
     },
     {
       "model_type": "combFunnelCounter",
       "build_params": "",
-      "exec_params": "90 10 512"
+      "exec_params": "90 10 32"
     }
   ]
 }

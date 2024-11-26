@@ -564,6 +564,47 @@ def draw_figure_6_plots(df_path, save_path):
     return
 
 
+def draw_example_plots(df_path, save_path):
+    df = load_and_prepare_main_df(df_path)
+    df = group_metrics(df)
+
+    legend_path = save_path + "/legends.png"
+    draw_legends(legend_path, fig4_legends)
+
+    figa_df = df[df["exec_params"] == "10 90 32"]
+    figa_path = save_path + "/figa.png"
+    draw_plot(
+        figa_path,
+        figa_df,
+        "thread_count",
+        "throughput_mean",
+        None,
+        fig4_legends,
+        "Example: 90% Fetch&Add, 512 cycles, throughput",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        y_multiplier=1e-3,
+    )
+
+    figb_df = df[df["exec_params"] == "90 10 32"]
+    figb_path = save_path + "/figb.png"
+    draw_plot(
+        figb_path,
+        figb_df,
+        "thread_count",
+        "throughput_mean",
+        None,
+        fig4_legends,
+        "Example: 10% Fetch&Add, 512 cycles, throughput",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        y_multiplier=1e-3,
+    )
+
+    print("Example plots are saved.")
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(description="Draw plots for the benchmark results")
     parser.add_argument(
@@ -571,7 +612,7 @@ def main():
         type=str,
         default="4",
         required=True,
-        choices=["3", "4", "5", "6"],
+        choices=["3", "4", "5", "6", "ex"],
         help="Figure number to draw",
     )
     parser.add_argument(
@@ -591,7 +632,8 @@ def main():
     figure_num = args.figure_num
     data_path = args.data_path
     save_path = args.save_path
-    save_path += f"/figure{figure_num}"
+    if save_path == "./results/plots":
+        save_path += f"/figure{figure_num}"
     os.makedirs(save_path, exist_ok=True)
 
     print(f"Drawing plots for figure {figure_num}...")
@@ -604,6 +646,8 @@ def main():
         draw_figure_5_plots(data_path, save_path)
     elif figure_num == "6":
         draw_figure_6_plots(data_path, save_path)
+    elif figure_num == "ex":
+        draw_example_plots(data_path, save_path)
 
 
 if __name__ == "__main__":
