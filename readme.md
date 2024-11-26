@@ -8,7 +8,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 ## Hardware/Software Requirements
 
-- An Intel machine with 40+ cores (80+ hyperthreads) with Docker
+- An Intel machine with 40+ cores (80+ hyperthreads) with Docker ([install docker](https://docs.docker.com/engine/install/))
 - The full set of experiments takes ~10 hours to run
 
 ## Getting Started Guide
@@ -17,7 +17,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
    - `git clone https://github.com/Diuven/aggregating-funnels.git && cd aggregating-funnels`
 
-2. Build the docker image ([install docker](https://docs.docker.com/engine/install/) if you haven't)
+2. Build the docker image 
 
    - `docker build --network=host --platform linux/amd64 -t aggfunnel .`
 
@@ -34,6 +34,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 5. Run the benchmark.
 
+   - Setting thread count: Truncate the `thread_list` parameter in `./local/preset_figure3.json`, `./local/preset_figure4.json`, `./local/preset_figure5.json` based on the number of logical cores on your machine.
    - Running `./scripts/run_counter_bench.sh` and `./scripts/run_queue_bench.sh` will build and run all the experiments, and generate the figures in the `results/plots` directory. This will take a couple of hours to run, depending on the number of threads available. stdout will show estimated time to completion for each figure.
    - During the benchmark, you can monitor the progress by checking stdout and the contents of the `results/` directory. `log.txt` will have the output logs, and `main.csv` will have the raw data for each run.
 
