@@ -282,6 +282,9 @@ namespace bench
             const char *conseq_ops_str = std::getenv("CONSEQ_OPS");
             int conseq_ops = conseq_ops_str ? std::stoi(conseq_ops_str) : 1;
 
+            const char *init_size_str = std::getenv("INIT_SIZE");
+            int init_size = init_size_str ? std::stoi(init_size_str) : 1;
+
             auto enqdeq_lambda = [this, &startFlag, &numPairs, &queue, &conseq_ops](const int tid)
             {
                 // printf("thread tid = %03d spawned\n", tid);
@@ -296,6 +299,9 @@ namespace bench
                     if (queue->dequeue(tid) == nullptr)
                         cout << "Error at warmup dequeueing iter=" << iter << "\n";
                 }
+
+                for (int i = 0; i < (init_size + tid) / numThreads; i++)
+                    queue->enqueue(&ud, tid);
 
                 queue->resetMetrics(tid);
 
