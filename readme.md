@@ -15,7 +15,7 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 
 1. Clone the repository, or download the artifact from the artifact archive.
 
-   - The artifact is archived and is availalbe in [Github release](https://github.com/Diuven/aggregating-funnels/releases/tag/artifact-archive)
+   - The artifact is archived and is available in [Github release V2](https://github.com/Diuven/aggregating-funnels/releases/tag/artifact-archive-v2)
    - If you don't have the artifact, run `git clone https://github.com/Diuven/aggregating-funnels.git && cd aggregating-funnels && git checkout -b artifact-submission origin/artifact-submission`
 
 2. Build the docker image ([install docker](https://docs.docker.com/engine/install/) if you haven't)
