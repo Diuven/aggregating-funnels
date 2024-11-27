@@ -17,8 +17,16 @@ RESULTb="results/queue/task__figure6b/main.csv"
 RESULTc="results/queue/task__figure6c/main.csv"
 ARGS="-w 32 -r 1024 -i 5"
 
-if [[ -f $RESULT ]]; then
-  mv $RESULT $RESULT.bak
+if [[ -f $RESULTa ]]; then
+  mv $RESULTa $RESULTa.bak
+fi
+
+if [[ -f $RESULTb ]]; then
+  mv $RESULTb $RESULTb.bak
+fi
+
+if [[ -f $RESULTc ]]; then
+  mv $RESULTc $RESULTc.bak
 fi
 
 if [[ -z "$MAX_THREADS" ]]; then
