@@ -537,15 +537,16 @@ def load_queue_df(data_path):
     main_df = main_df.rename(columns=int_cols_map)
     # split Benchmark into exec_params
     main_df["exec_params"] = main_df["task"].str.split("_").str[-1]
+    main_df["build_params"]=""
 
     return main_df
 
 
 def draw_figure_6_plots(df_path, save_path):
-    df = load_queue_df(df_path)
     legend_path = save_path + "/legends.png"
     draw_legends(legend_path, fig6_legends)
-
+    
+    df = load_queue_df(df_path+'a')
     fig6a_df = df
     fig6a_path = save_path + "/fig6a.png"
     draw_plot(
@@ -556,6 +557,40 @@ def draw_figure_6_plots(df_path, save_path):
         "throughput_std",
         fig6_legends,
         "6a: Pairwise enq-deq",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}",
+        y_multiplier=1e-6,
+    )
+
+    df = load_queue_df(df_path+'b')
+    fig6b_df = df
+    fig6b_path = save_path + "/fig6b.png"
+    draw_plot(
+        fig6b_path,
+        fig6b_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig6_legends,
+        "6b: Pairwise 4enq-4deq",
+        "Number of threads",
+        "Throughput (Mops/s)",
+        key_format="{model}",
+        y_multiplier=1e-6,
+    )
+
+    df = load_queue_df(df_path+'c')
+    fig6c_df = df
+    fig6c_path = save_path + "/fig6c.png"
+    draw_plot(
+        fig6c_path,
+        fig6c_df,
+        "thread_count",
+        "throughput_mean",
+        "throughput_std",
+        fig6_legends,
+        "6c: Pairwise enq-deq, init_size = 500",
         "Number of threads",
         "Throughput (Mops/s)",
         key_format="{model}",
