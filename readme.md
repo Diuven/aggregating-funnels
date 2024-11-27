@@ -51,5 +51,4 @@ ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 
 ## Notes
 
 - For the queue benchmark, we omitted LSCQ because it sometimes crashes. LSCQ has been shown in previous work to be slower than both LCRQ and LPRQ. Both LCRQ and LPRQ are included in the artifact submission.
-- Since the queue experiments are more complicated to script, it only generates one plot for 6a. 6b and 6c are expected to have similar trends.
 - We used a machine with Intel Xeon Platinum 8481C CPU (Sapphire Rapids) with 4 sockets for our experiments. Different machines may have different performance characteristics.
