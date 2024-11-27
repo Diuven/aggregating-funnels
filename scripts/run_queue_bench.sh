@@ -6,7 +6,9 @@ CC=clang-13 CXX=clang++-13 cmake -DCMAKE_BUILD_TYPE=Release -DUSE_LIBCPP=ON -DDI
 make -j8
 cd ../..
 
-mkdir -p results/queue/task__figure6
+mkdir -p results/queue/task__figure6a
+mkdir -p results/queue/task__figure6b
+mkdir -p results/queue/task__figure6c
 
 
 BENCH="lprq-fork/build/bench-enq-deq"
@@ -25,6 +27,7 @@ fi
 
 # if max thread is less than 64, use seq 4 4 max_thread
 if [[ $MAX_THREADS -lt 64 ]]; then
+  # THREADS="1 20 40"
   THREADS="1 2 "
   THREADS+=`seq 4 4 $MAX_THREADS | tr '\n' ' '`
 else
