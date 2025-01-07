@@ -394,7 +394,7 @@ def draw_figure_4_plots(df_path, save_path):
             y_multiplier=1e-3,
         )
 
-    fig4a_df = df[df["exec_params"] == "10 90 32"]
+    fig4a_df = df[df["exec_params"].str.contains("10 90 32")]
     fig4a_path = save_path + "/fig4a.png"
     draw_throughput_plot(
         fig4a_path, fig4a_df, "4a: 90% Fetch&Add, 512 cycles, throughput"
@@ -414,21 +414,21 @@ def draw_figure_4_plots(df_path, save_path):
         "Fairness",
     )
 
-    fig4c_df = df[df["exec_params"] == "10 90 2"]
+    fig4c_df = df[df["exec_params"].str.contains("10 90 2")]
     fig4c_path = save_path + "/fig4c.png"
     draw_throughput_plot(
         fig4c_path, fig4c_df, "4c: 90% Fetch&Add, 32 cycles, throughput"
     )
 
-    fig4d_df = df[df["exec_params"] == "0 100 32"]
+    fig4d_df = df[df["exec_params"].str.contains("0 100 32")]
     fig4d_path = save_path + "/fig4d.png"
     draw_throughput_plot(fig4d_path, fig4d_df, "4d: 100% Fetch&Add, throughput")
 
-    fig4e_df = df[df["exec_params"] == "50 50 32"]
+    fig4e_df = df[df["exec_params"].str.contains("50 50 32")]
     fig4e_path = save_path + "/fig4e.png"
     draw_throughput_plot(fig4e_path, fig4e_df, "4e: 50% Fetch&Add, throughput")
 
-    fig4f_df = df[df["exec_params"] == "90 10 32"]
+    fig4f_df = df[df["exec_params"].str.contains("90 10 32")]
     fig4f_path = save_path + "/fig4f.png"
     draw_throughput_plot(fig4f_path, fig4f_df, "4f: 10% Fetch&Add, throughput")
 
