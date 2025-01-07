@@ -1,5 +1,6 @@
 #include "./hardwareCounter.hpp"
 #include "./aggregatingFunnelCounter.hpp"
+#include "./fullAggregatingFunnelCounter.hpp"
 #include "./configuredAggregatingFunnelCounter.hpp"
 #include "./recursiveAggregatingFunnelCounter.hpp"
 #include "./combiningFunnelCounter.hpp"
@@ -15,6 +16,10 @@ typedef COMB_FUNNEL::CombiningFunnelCounter<long long> TargetCounter;
 #elif USE_SIMPLE_AGG_COUNTER
 #pragma message("Compiling with AggFunnelCounter")
 typedef SIMPLE_AGG_FUNNEL::AggFunnelCounter<long long> TargetCounter;
+
+#elif USE_FULL_AGG_COUNTER
+#pragma message("Compiling with FullAggFunnelCounter")
+typedef FULL_AGG_FUNNEL::FullAggFunnelCounter<long long> TargetCounter;
 
 #elif USE_CONFIGURED_AGG_COUNTER
 #pragma message("Compiling with ConfiguredAggFunnelCounter")

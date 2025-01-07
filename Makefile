@@ -37,6 +37,11 @@ aggFunnelCounter: counterBenchmark
 aggFunnelCounterTest: MACROFLAGS += -DUSE_SIMPLE_AGG_COUNTER
 aggFunnelCounterTest: counterTest
 
+fullAggFunnelCounter: MACROFLAGS += -DUSE_FULL_AGG_COUNTER
+fullAggFunnelCounter: counterBenchmark
+fullAggFunnelCounterTest: MACROFLAGS += -DUSE_FULL_AGG_COUNTER
+fullAggFunnelCounterTest: counterTest
+
 configuredAggFunnelCounter: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT) 
 configuredAggFunnelCounter: counterBenchmark
 configuredAggFunnelCounterTest: MACROFLAGS += -DUSE_CONFIGURED_AGG_COUNTER -DUSE_FIXED_AGGS -DAGG_COUNT=$(AGG_COUNT) -DDIRECT_COUNT=$(DIRECT_COUNT)

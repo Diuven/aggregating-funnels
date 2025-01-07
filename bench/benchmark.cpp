@@ -17,7 +17,7 @@
 
 #include "benchmarkUtils.hpp"
 
-typedef std::tuple<int, int> CounterOperation;
+typedef std::tuple<int, long long> CounterOperation;
 typedef std::tuple<long long, long long, std::vector<RunResult>> ResultsSummary;
 class CounterOperationGenerator
 {
@@ -26,12 +26,14 @@ private:
     static const int OP_TYPES = 2;
 
     int ratios_sum[OP_TYPES] = {100, 0}; // read, increment
+    long long diff_range;
     std::mt19937 mtg;
 
 public:
-    CounterOperationGenerator(int seed, const int ratios[])
+    CounterOperationGenerator(int seed, const int ratios[], long long diff_range)
     {
         this->seed = seed;
+        this->diff_range = diff_range;
 
         ratios_sum[0] = ratios[0];
         for (int i = 1; i < OP_TYPES; i++)
@@ -58,7 +60,7 @@ public:
         }
         else if (op == 1) // insert
         {
-            int diff = mtg() % 100 + 1;
+            long long diff = (((1LL * mtg()) << 30) + mtg()) % diff_range + 1;
             // int diff = 1;
             return CounterOperation(1, diff);
         }
@@ -67,7 +69,7 @@ public:
     }
 };
 
-ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_milliseconds, int read_percent, int increment_percent, int additional_work)
+ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_milliseconds, int read_percent, int increment_percent, int additional_work, long long diff_range)
 {
     TargetCounter *counter = get_target_counter(thread_count);
 
@@ -89,7 +91,7 @@ ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_millisecond
         {
             auto seed = core_seed * 1000 + id;
             std::string tid_hex = get_hex_thread_id();
-            auto gen = CounterOperationGenerator(seed, ratios);
+            auto gen = CounterOperationGenerator(seed, ratios, diff_range);
             long long count = 0;
 
             int rd_work = 0;
@@ -111,7 +113,7 @@ ResultsSummary run_benchmark(Timer &timer, int thread_count, int run_millisecond
                 }
                 else if (std::get<0>(op) == 1)
                 { // increment
-                    int diff = std::get<1>(op);
+                    long long diff = std::get<1>(op);
                     long long res = counter->fetch_add(diff, id);
                     rd_work += res;
                     count += diff;
@@ -187,7 +189,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " <thread_count> <run_milliseconds> [read_percent] [increment_percent] [additional_work]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <thread_count> <run_milliseconds> [read_percent] [increment_percent] [additional_work] [diff_range]" << std::endl;
         return 1;
     }
     assert(argc > 2);
@@ -200,17 +202,19 @@ int main(int argc, char const *argv[])
     int read_percent = (argc > ++arg_pos) ? std::stoi(argv[arg_pos]) : 50;
     int increment_percent = (argc > ++arg_pos) ? std::stoi(argv[arg_pos]) : 100 - read_percent;
     int additional_work = (argc > ++arg_pos) ? std::stoi(argv[arg_pos]) : 32;
+    long long diff_range = (argc > ++arg_pos) ? std::stoll(argv[arg_pos]) : 100LL;
 
     std::cout << "Thread count:        \t" << thread_count << std::endl;
     std::cout << "Run milliseconds:    \t" << run_milliseconds << std::endl;
     std::cout << "Read percent:        \t" << read_percent << std::endl;
     std::cout << "Increment percent:   \t" << increment_percent << std::endl;
-    std::cout << "Additional work:     \t" << additional_work << std::endl
+    std::cout << "Additional work:     \t" << additional_work << std::endl;
+    std::cout << "Diff range:          \t" << diff_range
               << std::endl;
 
     Timer timer;
     auto [max_access, root_access, results] = run_benchmark(
-        timer, thread_count, run_milliseconds, read_percent, increment_percent, additional_work);
+        timer, thread_count, run_milliseconds, read_percent, increment_percent, additional_work, diff_range);
     double ms = timer.elapsed();
 
     std::cout << " --- Benchmark results --- " << std::endl;

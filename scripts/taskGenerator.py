@@ -156,6 +156,7 @@ def trials_preset_figure3():
 def trials_preset_figure4():
     models_fig4 = [
         "aggFunnelCounter",
+        "fullAggFunnelCounter",
         "combFunnelCounter",
         "recursiveAggFunnelCounter",
         "hardwareCounter",
