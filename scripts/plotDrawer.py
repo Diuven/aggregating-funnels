@@ -61,6 +61,12 @@ fig3_legends = {
 fig4_legends = {
     "hardwareCounter": default_hw_spec,
     "aggFunnelCounter": default_agg_spec("AggFunnel"),
+    "fullAggFunnelCounter": {
+        "marker": "^",
+        "color": "tab:cyan",
+        "name": "FullAggFunnel",
+        "zorder": 10,
+    },
     "combFunnelCounter": {
         "marker": "x",
         "color": "tab:purple",
