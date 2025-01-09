@@ -40,22 +40,15 @@ namespace FULL_AGG_FUNNEL
             ~Node()
             {
                 deleted_node_count++;
-                std::cout << "Delete! " << deleted_node_count << ' ';
+                std::cout << "Delete! " << deleted_node_count << ". ";
                 delete mapping_list.load();
-                // if (prev_agg != nullptr)
-                // {
-                //     std::cerr << "Deleting prev_agg" << std::endl;
-                //     delete prev_agg;
-                // }
-                if (next_agg != nullptr)
-                {
-                    delete next_agg;
-                }
+                if (prev_agg != nullptr)
+                    delete prev_agg;
             };
         };
 
         alignas(1024) std::atomic<T> counter = 0;
-        Node child[FIXED_AGG_COUNT];
+        Node *aggs[2][FIXED_AGG_COUNT];
         int PADDING[32] = {};
 
     public:
@@ -65,6 +58,11 @@ namespace FULL_AGG_FUNNEL
         ~FullAggFunnelCounter()
         {
             delete ebr;
+            for (int i = 0; i < FIXED_AGG_COUNT; i++)
+            {
+                delete aggs[0][i];
+                delete aggs[1][i];
+            }
         }
         FullAggFunnelCounter(int thread_count) : FullAggFunnelCounter(0, thread_count) {}
         FullAggFunnelCounter(T start, int thread_count)
@@ -76,11 +74,16 @@ namespace FULL_AGG_FUNNEL
             counter.store(start);
             if (thread_count > ebr->thread_count)
                 ebr = new EpochBasedReclamation<MappingListNode>(thread_count);
+            for (int i = 0; i < FIXED_AGG_COUNT; i++)
+            {
+                aggs[0][i] = new Node();
+                aggs[1][i] = new Node();
+            }
         }
 
-        T update(Node *child, T child_from, T child_to, int thread_id)
+        T update(Node *child, int sign, T child_from, T child_to, int thread_id)
         {
-            T root_from = counter.fetch_add(child_to - child_from);
+            T root_from = counter.fetch_add(sign * (child_to - child_from));
             // MappingListNode *new_mapping = new MappingListNode();
             MappingListNode *new_mapping = ebr->get_new(thread_id);
 
@@ -96,7 +99,7 @@ namespace FULL_AGG_FUNNEL
             return root_from;
         }
 
-        T get_my_root(Node *child, T my_child_from, int thread_id)
+        T get_my_root(Node *child, int sign, T my_child_from, int thread_id)
         {
             MappingListNode *mapping = child->mapping_list.load();
             while (mapping->child_from > my_child_from)
@@ -106,19 +109,24 @@ namespace FULL_AGG_FUNNEL
 
             T root_from = mapping->root_from;
             T child_from = mapping->child_from;
-            return root_from + my_child_from - child_from;
+            return root_from + sign * (my_child_from - child_from);
         }
 
         T fetch_add(T diff, int thread_id)
         {
+            if (diff == 0)
+                return counter.load();
             int nd_idx = thread_id % FIXED_AGG_COUNT;
+            int sign = diff > 0 ? 1 : -1;
+            int nd_sg = diff > 0 ? 0 : 1;
+            diff = diff > 0 ? diff : -diff;
             if (nd_idx < 0)
             {
                 return counter.fetch_add(diff);
             }
             ebr->enterCritical(thread_id);
 
-            Node *child = &this->child[nd_idx];
+            Node *child = this->aggs[nd_sg][nd_idx];
             while (child->next_agg != nullptr)
                 child = child->next_agg;
             T child_from = child->count.fetch_add(diff);
@@ -139,7 +147,7 @@ namespace FULL_AGG_FUNNEL
             {
                 // I should do the work
                 T child_to = child->count.load();
-                root_from = update(child, child_from, child_to, thread_id);
+                root_from = update(child, sign, child_from, child_to, thread_id);
                 if (child_to >= REP_MAX)
                 {
                     // create a new aggregator
@@ -151,13 +159,13 @@ namespace FULL_AGG_FUNNEL
                     new_agg->prev_end_at.store(child_to);
                     child->next_agg = new_agg;
                     // std::cout << "Next!!" << std::endl;
-                    // this->child[nd_idx] = *new_agg;
+                    this->aggs[nd_sg][nd_idx] = new_agg;
                 }
             }
             else
             {
                 // Mine is already done
-                root_from = get_my_root(child, child_from, thread_id);
+                root_from = get_my_root(child, sign, child_from, thread_id);
             }
             ebr->exitCritical(thread_id);
             return root_from;
