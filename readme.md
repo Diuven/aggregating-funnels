@@ -3,8 +3,15 @@
 Software artifact associated with the following paper:
 
 Aggregating Funnels for Faster Fetch&Add and Queues\
-Younghun Roh, Yuanhao Wei, Eric Ruppert, Panagiota Fatourou, Siddhartha Jayanti, Julian Shun \
-ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP 2025)
+[Younghun Roh](https://diuven.xyz), [Yuanhao Wei](https://yuanhaow.github.io/), [Eric Ruppert](https://www.eecs.yorku.ca/~eruppert/), [Panagiota Fatourou](https://users.ics.forth.gr/~faturu/), [Siddhartha Jayanti](https://sites.google.com/view/siddhartha-jayanti/research), [Julian Shun](https://jshun.csail.mit.edu/) \
+ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming ([PPoPP 2025](https://ppopp25.sigplan.org/))
+
+https://doi.org/10.1145/3710848.3710873 \
+[[paper@ACM]](https://dl.acm.org/doi/10.1145/3710848.3710873) 
+[[paper@arxiv]](https://arxiv.org/abs/2411.14420) 
+[[code@Github]](https://github.com/Diuven/aggregating-funnels) 
+[[code@Zenodo]](https://zenodo.org/records/14602039) 
+[[presentation video]](https://www.youtube.com/watch?v=a-UEY4343n0)
 
 ## Hardware/Software Requirements
 
